@@ -1,0 +1,74 @@
+[
+  {
+    "id": "orlistat",
+    "names": [
+      "orlistat",
+      "xenical",
+      "羅鮮子",
+      "羅纖子"
+    ],
+    "title": "Orlistat（Xenical®）",
+    "route": "口服｜隨含脂肪的餐食使用",
+    "mechanism": "抑制腸胃道脂肪分解酵素，減少部分膳食脂肪吸收。",
+    "common": "常見為油便、排便急迫、排便次數增加、脹氣等。",
+    "caution": "慢性吸收不良症或膽汁鬱滯者不適合；也可能影響脂溶性維生素 A、D、E、K 的吸收。"
+  },
+  {
+    "id": "naltrexone_bupropion",
+    "names": [
+      "naltrexone",
+      "bupropion",
+      "contrave",
+      "康纖芙",
+      "納曲酮",
+      "安非他酮"
+    ],
+    "title": "Naltrexone/Bupropion（Contrave®／康纖芙）",
+    "route": "口服",
+    "mechanism": "作用於中樞食慾與獎賞相關路徑，幫助增加飽足感、減少食物攝取。",
+    "common": "常見噁心、便秘、頭痛、嘔吐；可能使血壓或心跳上升。",
+    "caution": "未控制高血壓、癲癇、部分精神疾病、暴食症／厭食症、長期使用鴉片類藥物者等需避免或特別評估；不可和 MAOI 併用。"
+  },
+  {
+    "id": "liraglutide",
+    "names": [
+      "liraglutide",
+      "saxenda",
+      "善纖達",
+      "利拉魯肽"
+    ],
+    "title": "Liraglutide（Saxenda®／善纖達）",
+    "route": "每日皮下注射",
+    "mechanism": "GLP-1 受體促效劑，可增加飽足感、降低食慾並延緩胃排空。",
+    "common": "常見噁心、腹痛、腹瀉、嘔吐、便秘或消化不良等腸胃道症狀。",
+    "caution": "本人或家族有甲狀腺髓質癌，或第二型多發性內分泌腫瘤症候群（MEN2）者禁止使用；通常需由低劑量逐步增加。"
+  },
+  {
+    "id": "semaglutide",
+    "names": [
+      "semaglutide",
+      "wegovy",
+      "週纖達",
+      "司美格魯肽"
+    ],
+    "title": "Semaglutide（Wegovy®／週纖達）",
+    "route": "每週皮下注射",
+    "mechanism": "GLP-1 受體促效劑，可增加飽足感、降低食慾並延緩胃排空。",
+    "common": "常見噁心、腹痛、腹瀉、嘔吐、便秘或消化不良等腸胃道症狀。",
+    "caution": "本人或家族有甲狀腺髓質癌，或 MEN2 者禁止使用；通常需由低劑量逐步增加。"
+  },
+  {
+    "id": "tirzepatide",
+    "names": [
+      "tirzepatide",
+      "mounjaro",
+      "猛健樂",
+      "替爾泊肽"
+    ],
+    "title": "Tirzepatide（Mounjaro®／猛健樂）",
+    "route": "每週皮下注射",
+    "mechanism": "同時作用於 GIP 與 GLP-1 受體，幫助增加飽足感、降低食慾並調節代謝。",
+    "common": "常見噁心、嘔吐、腹瀉、便秘、腹脹、胃食道逆流或消化不良等。",
+    "caution": "本人或家族有甲狀腺髓質癌，或 MEN2 者禁止使用；通常需由低劑量逐步增加。"
+  }
+]

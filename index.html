@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>一起聊聊健康體位｜2024 國健署 139 問完整衛教 Chatbot</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="shell">
+<header><div class="logo">聊</div><div><h1>一起聊聊健康體位</h1><p>2024 國健署《一起聊聊肥胖症：你該問的100+件事》Q1–Q139 完整涵蓋版</p></div></header>
+<div class="sourcebar"><b>主要資料來源：</b>衛生福利部國民健康署 2024《一起聊聊肥胖症：你該問的100+件事》。本工具依官方 <b>Q1–Q139</b> 逐題建立知識節點，回答為病人容易理解的摘要與重新表述，<b>不是官方原文逐字重製</b>。<span class="badge">139 個知識節點</span> <a href="https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12" target="_blank" rel="noopener">查看國健署資料</a><br><b>減重藥物更新：</b>臺大醫院健康電子報 2026 年 5 月〈減重藥物介紹〉，補充台灣目前核准用於長期體重控制之藥物。 <a href="https://epaper.ntuh.gov.tw/health/202605/project_3.html" target="_blank" rel="noopener">查看臺大醫院資料</a></div>
+<div class="layout">
+<aside>
+<div class="asideTitle">今天比較想聊哪一件事？</div>
+<button class="starter" data-text="我最近變胖了，想先看自己算不算肥胖">📏 先看看自己的體位</button>
+<button class="starter" data-text="我想減重，但不知道要從飲食還是運動開始">🥗 想開始減重</button>
+<button class="starter" data-text="我已經很努力，可是體重一直卡住">😵‍💫 一直卡關或復胖</button>
+<button class="starter" data-text="我想知道減重藥物或瘦瘦針適不適合">💉 想了解減重藥</button>
+<button class="starter" data-text="我想問小孩或青少年的體重問題">🧒 小孩／青少年</button>
+<button class="starter" data-text="我想問長輩的體重和肌少肥胖">👵 長輩／肌少肥胖</button>
+<button id="browseBtn" class="browseBtn">📚 瀏覽完整 139 題</button>
+<input id="sideSearch" class="searchbox" placeholder="搜尋題庫，例如：脂肪肝、宵夜、手術">
+<div id="catlist" class="catlist"></div>
+<div id="questionList"></div>
+<div class="asideNote"><b>可以用生活化的語氣：</b><br>「165/72 算胖嗎？」<br>「小孩脖子黑黑的是什麼？」<br>「珍奶戒不掉怎麼辦？」<br>「做過減重手術可以懷孕嗎？」<br>「我爸 75 歲減重會不會掉肌肉？」</div>
+</aside>
+<section class="chatcol"><div id="chat"></div><div class="composer"><div class="row"><input id="q" autocomplete="off" placeholder="想問什麼就直接說，例如：減重後月經亂掉正常嗎？"><button id="send">送出</button></div><div class="hint">本工具提供一般衛教。涉及診斷、藥物劑量、手術適應症或個別醫療決策時，仍需由醫師評估。</div></div></section>
+</div>
+<footer>請勿輸入姓名、病歷號、電話或其他可識別個人資料。若有胸痛、嚴重呼吸困難、昏厥、意識改變、持續嘔吐等急性不適，請立即就醫。</footer>
+</div>
+<script src="js/chatbot.js" defer></script>
+</body></html>
