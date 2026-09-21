@@ -82,8 +82,8 @@ function renderList(cat=null,term=''){const list=document.getElementById('questi
 
 async function loadData(){
   const [kbResponse, drugResponse] = await Promise.all([
-    fetch('data/obesity_139.json'),
-    fetch('data/medications.json')
+    fetch('obesity_139.json'),
+    fetch('medications.json')
   ]);
 
   if(!kbResponse.ok) throw new Error('無法載入 obesity_139.json');
