@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261003-6';
+const BUILD_VERSION='20261003-7';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -321,6 +321,84 @@ function handleBMIInput(raw){
   return true;
 }
 
+
+const CONVERSATION_INTENTS=[
+  {
+    id:'sugary_drinks',
+    test:s=>/(珍奶|珍珠奶茶|手搖|奶茶|含糖飲料|汽水|可樂|甜飲).*(戒不掉|忍不住|每天喝|很愛喝|常喝|怎麼辦)|(戒不掉|忍不住|每天喝|很愛喝|常喝).*(珍奶|珍珠奶茶|手搖|奶茶|含糖飲料|汽水|可樂|甜飲)/.test(s),
+    lead:'不用第一天就逼自己和珍奶完全分手。比起「從此不能喝」，先把頻率、甜度或份量往下調，通常比較做得久。',
+    body:'含糖飲料很容易帶入額外糖與熱量，而且不像固體食物那麼有飽足感。體重管理不一定要把每一口都算得很精準，但飲料是很值得先留意的熱量來源。',
+    action:'可以先選一個你做得到的版本：例如每天喝改成每週幾次、全糖改半糖／微糖、或大杯改小杯。先做到一件，再慢慢調整。',
+    refs:['Q72','Q74','Q84'],
+    follow:['我都外食怎麼辦？','無糖燕麥奶可以一直喝嗎？','一天到底該吃多少熱量？']
+  },
+  {
+    id:'late_night_snack',
+    test:s=>/(宵夜|半夜吃|晚上一直吃|夜食).*(戒不掉|忍不住|很餓|怎麼辦|會胖)|(戒不掉|忍不住|很餓).*(宵夜|半夜吃|晚上吃)/.test(s),
+    lead:'如果晚上特別容易想吃，不一定只是「意志力差」；白天吃太少、作息亂或壓力大，都可能讓晚上更難控制。',
+    body:'體重管理要看整天的飲食與生活型態。過度限制、作息不規律和情緒壓力，都可能讓飲食更難維持。',
+    action:'先觀察 3–7 天：白天有沒有吃太少、晚餐是否太早、睡眠是否不足，以及晚上想吃時是真的餓還是習慣。找到原因再調整，比硬忍有效。',
+    refs:['Q73','Q74','Q92'],
+    follow:['我常常吃很少還是瘦不下來','輪班晚睡怎麼減重？','一天該吃多少熱量？']
+  },
+  {
+    id:'hate_exercise',
+    test:s=>/(不愛運動|討厭運動|懶得運動|不想運動|想到運動就累|下班很累).*/.test(s),
+    lead:'那就不要把第一個目標設成「愛上運動」。先讓自己比現在多動一點就可以。',
+    body:'身體活動可以分段累積，不一定要一次做很久；即使沒有規律運動，從增加日常活動量開始也有意義。',
+    action:'例如飯後走 10 分鐘、提早一站下車、工作中多起身幾次。先把活動放進原本生活，比一開始要求自己每天去健身房更實際。',
+    refs:['Q78','Q98','Q99'],
+    follow:['只有走路有用嗎？','一次只能運動10分鐘算嗎？','成人每天要運動多久？']
+  },
+  {
+    id:'carb_fear',
+    test:s=>/(澱粉|白飯|飯|麵|碳水).*(不敢吃|不能吃|要戒|完全不吃|會胖)|(不敢吃|不能吃|要戒|完全不吃).*(澱粉|白飯|飯|麵|碳水)/.test(s),
+    lead:'不用先把白飯當成敵人。體重管理重點是整體飲食型態和份量，不是把某一類食物完全刪掉。',
+    body:'玉米、芋頭、地瓜等也屬於主食／澱粉來源；不同飲食法各有特點，但沒有一種方法適合所有人。',
+    action:'先從份量和種類調整，比完全不吃更容易維持；如果想試低碳或其他飲食法，也要兼顧營養與長期可行性。',
+    refs:['Q77','Q86'],
+    follow:['玉米芋頭也算澱粉嗎？','低碳飲食適合我嗎？','減重飲食到底選哪一種？']
+  },
+  {
+    id:'scale_anxiety',
+    test:s=>/(每天量體重|一直量體重|體重一直跳|一天差很多|體重忽高忽低)/.test(s),
+    lead:'體重每天上下跳一點很常見，不需要把每一次變化都解讀成變胖或變瘦。',
+    body:'體重會受到飲水、進食、排便與生理期影響。比單次數字更重要的是在相近條件下看一段時間的趨勢。',
+    action:'固定在相近時間與條件量，例如早晨起床排尿後；看 2–4 週趨勢，比盯著一天的變化更有意義。',
+    refs:['Q48','Q108'],
+    follow:['一天什麼時間量體重最準？','體重突然增加一定是吃太多嗎？','平台期怎麼辦？']
+  }
+];
+
+function showConversationIntent(ci){
+  msg(ci.lead);
+
+  const refs=ci.refs.map(id=>KB.find(x=>x.id===id)).filter(Boolean);
+  const c=document.getElementById('chat');
+  const d=document.createElement('div');
+  d.className='factCard';
+  d.innerHTML=
+    '<div class="factTitle">📖 2024 冊子重點整理</div>'+
+    '<div class="factBody">'+esc(ci.body)+'</div>'+
+    '<div class="sourceQ"><b>參考官方 '+refs.map(x=>esc(x.id)).join('、')+'</b><span>｜'+[...new Set(refs.map(x=>x.cat))].join('、')+'</span><a href="'+OFFICIAL+'" target="_blank" rel="noopener">查看國健署原始資料</a></div>';
+  c.appendChild(d);
+
+  actionCard(ci.action);
+
+  const followItems=ci.follow.map(text=>{
+    const ranked=searchKB(text);
+    return ranked[0]&&ranked[0][0]>=10?ranked[0][1]:null;
+  }).filter(Boolean);
+
+  if(followItems.length) pills(followItems.slice(0,3));
+  c.scrollTop=c.scrollHeight;
+}
+
+function conversationIntentRoute(raw){
+  const s=norm(raw);
+  return CONVERSATION_INTENTS.find(x=>x.test(s))||null;
+}
+
 function intentRoute(raw){
   const s=norm(raw);
 
@@ -421,6 +499,12 @@ function ask(text){
 
   if(STATE.pendingIntent==='body' && !/(身高|體重|腰[圍围]|bmi|公分|公斤|kg|男性|女性|男生|女生|^\s*\d{2,3}(?:\.\d+)?\s*$)/i.test(raw)){
     resetBodyState();
+  }
+
+  const conversational=conversationIntentRoute(raw);
+  if(conversational){
+    showConversationIntent(conversational);
+    return;
   }
 
   const matchedDrug=matchDrug(raw);
