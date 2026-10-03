@@ -4,9 +4,18 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
+const BUILD_VERSION='20261003-4';
+
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
 const EMERGENCY=['胸痛','呼吸困難','喘不過氣','昏倒','昏厥','意識不清','抽搐','吐血','黑便','持續嘔吐','吐不停'];
+function normalizeNumberText(s){
+  return String(s||'')
+    .replace(/[０-９]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0xFEE0))
+    .replace(/．/g,'.')
+    .replace(/，/g,',')
+    .replace(/：/g,':');
+}
 function norm(s){return(s||'').toLowerCase().replace(/[\s，。！？、：；,.!?;:()（）\-_/]/g,'');}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
 function msg(t,me=false){const c=document.getElementById('chat'),w=document.createElement('div');w.className='msg '+(me?'me':'bot');if(!me){const f=document.createElement('div');f.className='face';f.textContent='聊';w.appendChild(f)}const b=document.createElement('div');b.className='bubble';b.textContent=t;w.appendChild(b);c.appendChild(w);c.scrollTop=c.scrollHeight;}
@@ -60,43 +69,60 @@ function show(item,fromBrowse=false){
 }
 
 function parseMeasurements(raw){
-  const original=String(raw||'').trim();
-  const s=original.replace(/，/g,',');
-  const lower=s.toLowerCase();
+  const s=normalizeNumberText(raw).trim();
+  const compact=s.replace(/\s+/g,'');
   let h=null,w=null;
 
-  // 明確單位：165 cm / 165公分 / 1.65 m
-  let mh=lower.match(/(?:身高\s*[:：]?\s*)?(\d{2,3}(?:\.\d+)?)\s*(?:cm|公分|厘米)/i);
-  if(mh) h=Number(mh[1]);
-
-  if(!h){
-    const mm=lower.match(/(?:身高\s*[:：]?\s*)?(1(?:\.\d{1,2})?)\s*(?:m|公尺|米)(?!m)/i);
-    if(mm) h=Number(mm[1])*100;
+  // 最常見：身高170，體重80 / 身高170 體重80 / 身高:170 體重:80
+  let pair=compact.match(/身高[:：]?(\d{2,3}(?:\.\d+)?)(?:公分|cm|厘米)?[,，、;；]?體重[:：]?(\d{2,3}(?:\.\d+)?)(?:公斤|kg|千克)?/i);
+  if(pair){
+    h=Number(pair[1]);
+    w=Number(pair[2]);
   }
 
-  let mw=lower.match(/(?:體重\s*[:：]?\s*)?(\d{2,3}(?:\.\d+)?)\s*(?:kg|公斤|千克)/i);
-  if(mw) w=Number(mw[1]);
+  // 反過來寫：體重80，身高170
+  if(!h&&!w){
+    pair=compact.match(/體重[:：]?(\d{2,3}(?:\.\d+)?)(?:公斤|kg|千克)?[,，、;；]?身高[:：]?(\d{2,3}(?:\.\d+)?)(?:公分|cm|厘米)?/i);
+    if(pair){
+      w=Number(pair[1]);
+      h=Number(pair[2]);
+    }
+  }
 
-  // 有標籤、沒單位：身高165 體重72
+  // 有單位但沒標籤：170cm 80kg / 1.70m 80kg
   if(!h){
-    const m=s.match(/身高\s*[:：]?\s*(\d{2,3}(?:\.\d+)?)/i);
+    let m=s.match(/(\d{2,3}(?:\.\d+)?)\s*(?:cm|公分|厘米)/i);
     if(m) h=Number(m[1]);
   }
+  if(!h){
+    let m=s.match(/(1(?:\.\d{1,2})?)\s*(?:m|公尺|米)(?!m)/i);
+    if(m) h=Number(m[1])*100;
+  }
   if(!w){
-    const m=s.match(/體重\s*[:：]?\s*(\d{2,3}(?:\.\d+)?)/i);
+    let m=s.match(/(\d{2,3}(?:\.\d+)?)\s*(?:kg|公斤|千克)/i);
     if(m) w=Number(m[1]);
   }
 
-  // 簡寫：165/72、165 72、165,72。排除明顯血壓語境。
+  // 有標籤但只有其中一項
+  if(!h){
+    let m=s.match(/身高\s*[:：]?\s*(\d{2,3}(?:\.\d+)?)/i);
+    if(m) h=Number(m[1]);
+  }
+  if(!w){
+    let m=s.match(/體重\s*[:：]?\s*(\d{2,3}(?:\.\d+)?)/i);
+    if(m) w=Number(m[1]);
+  }
+
+  // 最簡寫：170/80、170 80、170,80
   if(!h&&!w&&!/(血壓|bp)/i.test(s)){
-    const pair=s.match(/^\s*(1\d{2}(?:\.\d+)?)\s*[\/、,，\s]+\s*(\d{2,3}(?:\.\d+)?)\s*$/);
+    pair=s.match(/^\s*(1\d{2}(?:\.\d+)?)\s*[\/、,，\s]+\s*(\d{2,3}(?:\.\d+)?)\s*$/);
     if(pair){
       h=Number(pair[1]);
       w=Number(pair[2]);
     }
   }
 
-  // 正在等待 BMI 資料時，可下一句只輸入一個數字。
+  // BMI 對話流程中，下一句只打一個數字也可。
   if(STATE.pendingIntent==='bmi'&&!h&&!w&&/^\s*\d{2,3}(?:\.\d+)?\s*$/.test(s)){
     const n=Number(s.trim());
     if(!STATE.height&&n>=120&&n<=230) h=n;
@@ -250,6 +276,16 @@ function ask(text){
   // 先處理 BMI 實際數值；可接受同一句或分兩次輸入。
   if(handleBMIInput(raw)) return;
 
+  const simple=norm(raw);
+  if(/(想.*(算|看).*(bmi|體位|胖|肥胖|過重)|算不算肥胖|算不算胖|bmi怎麼算)/i.test(simple)){
+    startIntent('BMI',false);
+    return;
+  }
+  if(/^(我)?想(要)?(開始)?減重$|不知道怎麼開始減重|想開始減重/.test(simple)){
+    startIntent('START',false);
+    return;
+  }
+
   const matchedDrug=matchDrug(raw);
   if(matchedDrug){
     showDrug(matchedDrug.id);
@@ -286,8 +322,8 @@ function renderList(cat=null,term=''){const list=document.getElementById('questi
 
 async function loadData(){
   const [kbResponse, drugResponse] = await Promise.all([
-    fetch('obesity_139.json'),
-    fetch('medications.json')
+    fetch('obesity_139.json?v='+BUILD_VERSION,{cache:'no-store'}),
+    fetch('medications.json?v='+BUILD_VERSION,{cache:'no-store'})
   ]);
 
   if(!kbResponse.ok) throw new Error('無法載入 obesity_139.json');
@@ -297,10 +333,50 @@ async function loadData(){
   DRUGS = await drugResponse.json();
 }
 
+function startIntent(intent,echoUser=true){
+  if(intent==='BMI'){
+    if(echoUser) msg('📏 先看看自己的體位',true);
+    STATE.pendingIntent='bmi';
+    STATE.height=null;
+    STATE.weight=null;
+    msg('可以，直接輸入身高和體重就好，例如「身高170，體重80」或「170/80」。我會直接幫你算 BMI。');
+    return;
+  }
+
+  if(intent==='START'){
+    if(echoUser) msg('🥗 想開始減重',true);
+    msg('可以，先不用一次把所有事情都改掉。你想先從哪一個方向開始？');
+    pills(['Q65','Q72','Q80'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
+    return;
+  }
+
+  if(intent==='CHILD'){
+    if(echoUser) msg('🧒 小孩／青少年',true);
+    msg('孩子還在成長，體位不能直接套成人標準。你比較想了解哪一件事？');
+    pills(['Q7','Q15','Q20','Q42'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
+    return;
+  }
+
+  if(intent==='OLDER'){
+    if(echoUser) msg('👵 長輩／肌少肥胖',true);
+    msg('長輩的體重管理除了公斤數，也要一起看肌肉、營養和功能。你比較想了解哪一件事？');
+    pills(['Q132','Q134','Q135','Q138'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
+    return;
+  }
+
+  if(/^Q\d+$/.test(intent)){
+    const item=KB.find(x=>x.id===intent);
+    if(item){
+      if(echoUser) msg(item.title,true);
+      show(item,false);
+    }
+  }
+}
+
 function bindUI(){
   document.getElementById('send').onclick=()=>ask();
   document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});
-  document.querySelectorAll('.starter').forEach(b=>b.onclick=()=>ask(b.dataset.text));
+  document.querySelectorAll('.starter').forEach(b=>b.onclick=()=>startIntent(b.dataset.intent));
 
   document.getElementById('browseBtn').onclick=()=>{
     document.getElementById('questionList').style.display='block';
