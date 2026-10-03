@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261003-7';
+const BUILD_VERSION='20261003-8';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -401,6 +401,11 @@ function conversationIntentRoute(raw){
 
 function intentRoute(raw){
   const s=norm(raw);
+
+  // 減重後月經／經期異常：生活化說法優先直接命中 Q71。
+  if(/(減重|減肥|瘦了|體重下降|吃太少|節食|運動太多).*(月經亂|經期亂|月經不規則|月經不來|沒月經|停經|mc亂|生理期亂)|(月經亂|經期亂|月經不規則|月經不來|沒月經|停經|mc亂|生理期亂).*(減重|減肥|瘦了|體重下降|吃太少|節食|運動太多)/.test(s))
+    return KB.find(x=>x.id==='Q71');
+
 
   // BMI／成人體位：先處理可執行功能，不讓它落入一般文字配對。
   if(/(bmi|算.*胖|算.*體位|身高.*體重|體重.*身高|成人.*(過重|肥胖)|體位.*標準)/i.test(s))
