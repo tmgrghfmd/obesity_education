@@ -1,10 +1,10 @@
 let KB=[];
 let DRUGS=[];
 
-const STATE={pendingIntent:null,height:null,weight:null};
+const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261003-4';
+const BUILD_VERSION='20261003-5';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -59,7 +59,7 @@ function matchDrug(raw){
 
 function show(item,fromBrowse=false){
   if(fromBrowse)msg(item.title,true);
-  if(item.id==='Q44') STATE.pendingIntent='bmi';
+  if(item.id==='Q44') STATE.pendingIntent='body';
   msg(item.soft);
   factCard(item);
   actionCard(item.action);
@@ -71,16 +71,26 @@ function show(item,fromBrowse=false){
 function parseMeasurements(raw){
   const s=normalizeNumberText(raw).trim();
   const compact=s.replace(/\s+/g,'');
-  let h=null,w=null;
+  let h=null,w=null,waist=null,sex=null;
 
-  // 最常見：身高170，體重80 / 身高170 體重80 / 身高:170 體重:80
+  // 性別：腰圍切點需分男性／女性。
+  const female=/(女性|女生|女)(?!性化)/.test(s);
+  const male=/(男性|男生|男)/.test(s);
+  if(female&&!male) sex='F';
+  else if(male&&!female) sex='M';
+
+  // 腰圍：腰圍85、腰圍 85 cm、腰围85。
+  const mwc=s.match(/腰[圍围]\s*[:：]?\s*(\d{2,3}(?:\.\d+)?)\s*(?:cm|公分|厘米)?/i);
+  if(mwc) waist=Number(mwc[1]);
+
+  // 最常見：身高170，體重80 / 身高170 體重80
   let pair=compact.match(/身高[:：]?(\d{2,3}(?:\.\d+)?)(?:公分|cm|厘米)?[,，、;；]?體重[:：]?(\d{2,3}(?:\.\d+)?)(?:公斤|kg|千克)?/i);
   if(pair){
     h=Number(pair[1]);
     w=Number(pair[2]);
   }
 
-  // 反過來寫：體重80，身高170
+  // 反過來：體重80，身高170
   if(!h&&!w){
     pair=compact.match(/體重[:：]?(\d{2,3}(?:\.\d+)?)(?:公斤|kg|千克)?[,，、;；]?身高[:：]?(\d{2,3}(?:\.\d+)?)(?:公分|cm|厘米)?/i);
     if(pair){
@@ -89,7 +99,7 @@ function parseMeasurements(raw){
     }
   }
 
-  // 有單位但沒標籤：170cm 80kg / 1.70m 80kg
+  // 有單位但沒標籤
   if(!h){
     let m=s.match(/(\d{2,3}(?:\.\d+)?)\s*(?:cm|公分|厘米)/i);
     if(m) h=Number(m[1]);
@@ -103,7 +113,7 @@ function parseMeasurements(raw){
     if(m) w=Number(m[1]);
   }
 
-  // 有標籤但只有其中一項
+  // 有標籤但沒單位
   if(!h){
     let m=s.match(/身高\s*[:：]?\s*(\d{2,3}(?:\.\d+)?)/i);
     if(m) h=Number(m[1]);
@@ -113,39 +123,134 @@ function parseMeasurements(raw){
     if(m) w=Number(m[1]);
   }
 
-  // 最簡寫：170/80、170 80、170,80
+  // 170/80、170 80、170,80；若句子有腰圍/性別也可辨識。
   if(!h&&!w&&!/(血壓|bp)/i.test(s)){
-    pair=s.match(/^\s*(1\d{2}(?:\.\d+)?)\s*[\/、,，\s]+\s*(\d{2,3}(?:\.\d+)?)\s*$/);
-    if(pair){
-      h=Number(pair[1]);
-      w=Number(pair[2]);
+    const bodyContext=STATE.pendingIntent==='body'||/(身高|體重|腰[圍围]|bmi|公分|公斤|kg|男性|女性|男生|女生)/i.test(s);
+    const pairAnywhere=s.match(/(?:^|[，,、;\s])\s*(1\d{2}(?:\.\d+)?)\s*[\/、,，\s]+\s*(\d{2,3}(?:\.\d+)?)\s*(?:$|[，,、;\s])/);
+    if(pairAnywhere&&bodyContext){
+      h=Number(pairAnywhere[1]);
+      w=Number(pairAnywhere[2]);
+    }else{
+      const pairOnly=s.match(/^\s*(1\d{2}(?:\.\d+)?)\s*[\/、,，\s]+\s*(\d{2,3}(?:\.\d+)?)\s*$/);
+      if(pairOnly){
+        h=Number(pairOnly[1]);
+        w=Number(pairOnly[2]);
+      }
     }
   }
 
-  // BMI 對話流程中，下一句只打一個數字也可。
-  if(STATE.pendingIntent==='bmi'&&!h&&!w&&/^\s*\d{2,3}(?:\.\d+)?\s*$/.test(s)){
+  // 體位評估流程中，可下一句只打一個數字。
+  if(STATE.pendingIntent==='body'&&!h&&!w&&!waist&&/^\s*\d{2,3}(?:\.\d+)?\s*$/.test(s)){
     const n=Number(s.trim());
     if(!STATE.height&&n>=120&&n<=230) h=n;
     else if(!STATE.weight&&n>=25&&n<=300) w=n;
+    else if(!STATE.waist&&n>=40&&n<=200) waist=n;
   }
 
   if(!(h>=120&&h<=230)) h=null;
   if(!(w>=25&&w<=300)) w=null;
-  return {h,w};
+  if(!(waist>=40&&waist<=200)) waist=null;
+  return {h,w,waist,sex};
+}
+
+function waistAssessment(sex,waist){
+  const cutoff=sex==='M'?90:80;
+  const label=sex==='M'?'男性':'女性';
+  const high=waist>=cutoff;
+  return {
+    cutoff,
+    label,
+    high,
+    text:label+'腰圍 '+waist+' 公分，'+(high?'已達':'未達')+'腹部肥胖判讀切點（'+label+' '+(high?'≥':'<')+cutoff+' 公分）。'
+  };
+}
+
+function showBodyAssessment(){
+  const h=STATE.height,w=STATE.weight,sex=STATE.sex,waist=STATE.waist;
+  const hasBMI=!!(h&&w);
+  const hasWaist=!!(sex&&waist);
+
+  if(hasBMI&&hasWaist){
+    const bmi=w/Math.pow(h/100,2);
+    let bmiClass;
+    if(bmi<18.5) bmiClass='體重過輕';
+    else if(bmi<24) bmiClass='健康體位';
+    else if(bmi<27) bmiClass='過重';
+    else bmiClass='肥胖';
+
+    const wa=waistAssessment(sex,waist);
+    let overall='';
+    if(bmi>=24&&wa.high) overall='BMI 與腰圍都偏高，建議進一步留意血壓、血糖、血脂、脂肪肝與睡眠呼吸中止等肥胖相關健康風險。';
+    else if(bmi<24&&wa.high) overall='BMI 雖在健康體位範圍，但腰圍已達腹部肥胖切點，仍值得留意腹部脂肪與代謝風險。';
+    else if(bmi>=24&&!wa.high) overall='腰圍目前未達腹部肥胖切點，但 BMI 偏高，仍建議從整體健康風險一起評估。';
+    else overall='BMI 與腰圍目前都未達過重／腹部肥胖切點，建議持續維持健康飲食與規律活動。';
+
+    msg('我幫你一起看：\n'+h+' 公分、'+w+' 公斤，BMI 約 '+bmi.toFixed(1)+'，屬於「'+bmiClass+'」。\n'+wa.text+'\n\n'+overall);
+    const q44=KB.find(x=>x.id==='Q44');
+    if(q44) factCard(q44);
+    pills(['Q45','Q46','Q50'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
+    resetBodyState();
+    return true;
+  }
+
+  if(hasBMI){
+    const bmi=w/Math.pow(h/100,2);
+    let cls,next;
+    if(bmi<18.5){cls='體重過輕';next='這時候不建議再追求減重，反而要先確認營養與健康狀況。';}
+    else if(bmi<24){cls='健康體位';next='如果腰圍偏大或健檢有三高，仍可以把腹部脂肪與代謝風險一起看。';}
+    else if(bmi<27){cls='過重';next='可以先從能長期維持的飲食與活動調整開始。';}
+    else{cls='肥胖';next='建議再搭配腰圍與肥胖相關疾病一起評估，而不是只看 BMI。';}
+
+    msg('我幫你算好了：'+h+' 公分、'+w+' 公斤，BMI 約 '+bmi.toFixed(1)+'，依台灣成人標準屬於「'+cls+'」。\n\n'+next+'\n\n如果想一起看腹部肥胖，可以再輸入例如「男，腰圍92」或「女，腰圍82」。');
+    const q44=KB.find(x=>x.id==='Q44');
+    if(q44) factCard(q44);
+    STATE.pendingIntent='body';
+    return true;
+  }
+
+  if(hasWaist){
+    const wa=waistAssessment(sex,waist);
+    msg(wa.text+'\n\n'+(wa.high?'腰圍達切點時，建議再搭配 BMI 與代謝相關健康狀況一起評估。':'腰圍目前未達腹部肥胖切點；若能再提供身高與體重，我也可以一起計算 BMI。'));
+    pills(['Q44','Q45','Q50'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
+    resetBodyState();
+    return true;
+  }
+
+  return false;
+}
+
+function resetBodyState(){
+  STATE.pendingIntent=null;
+  STATE.height=null;
+  STATE.weight=null;
+  STATE.sex=null;
+  STATE.waist=null;
 }
 
 function handleBMIInput(raw){
   const m=parseMeasurements(raw);
-  if(!m.h&&!m.w) return false;
+  const bodyMention=/(身高|體重|腰[圍围]|bmi|公分|公斤|kg|男性|女性|男生|女生)/i.test(raw)||STATE.pendingIntent==='body';
 
-  STATE.pendingIntent='bmi';
+  if(!m.h&&!m.w&&!m.waist&&!m.sex) return false;
+  if(!bodyMention&&!m.h&&!m.w&&!m.waist) return false;
+
+  STATE.pendingIntent='body';
   if(m.h) STATE.height=m.h;
   if(m.w) STATE.weight=m.w;
+  if(m.waist) STATE.waist=m.waist;
+  if(m.sex) STATE.sex=m.sex;
 
-  if(STATE.height&&STATE.weight){
-    bmiReply(STATE.height,STATE.weight);
+  if(STATE.waist&&!STATE.sex){
+    msg('收到，腰圍 '+STATE.waist+' 公分。腰圍的判讀切點男女不同，請再告訴我是男性或女性。');
     return true;
   }
+
+  if(STATE.sex&&!STATE.waist&&!STATE.height&&!STATE.weight){
+    msg('收到。再告訴我腰圍就可以，例如「腰圍85」。');
+    return true;
+  }
+
+  if(showBodyAssessment()) return true;
 
   if(STATE.height&&!STATE.weight){
     msg('收到，身高 '+STATE.height+' 公分。再告訴我體重就可以，例如「72 公斤」或直接輸入「72」。');
@@ -157,35 +262,7 @@ function handleBMIInput(raw){
     return true;
   }
 
-  return false;
-}
-
-function bmiReply(h,w){
-  const bmi=w/Math.pow(h/100,2);
-  let cls,next;
-  if(bmi<18.5){
-    cls='體重過輕';
-    next='這時候不建議再追求減重，反而要先確認營養與健康狀況。';
-  }else if(bmi<24){
-    cls='健康體位';
-    next='如果腰圍偏大或健檢有三高，仍可以把腹部脂肪與代謝風險一起看。';
-  }else if(bmi<27){
-    cls='過重';
-    next='可以先從能長期維持的飲食與活動調整開始。';
-  }else{
-    cls='肥胖';
-    next='建議再搭配腰圍與肥胖相關疾病一起評估，而不是只看 BMI。';
-  }
-
-  msg('我幫你算好了：'+h+' 公分、'+w+' 公斤，BMI 約 '+bmi.toFixed(1)+'，依台灣成人標準屬於「'+cls+'」。\n\n'+next);
-  const q44=KB.find(x=>x.id==='Q44');
-  if(q44) factCard(q44);
-  actionCard('如果方便，再量一次腰圍。男性 ≥90 公分、女性 ≥80 公分時，要多留意腹部肥胖與代謝風險。');
-  pills(['Q45','Q46','Q50'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
-
-  STATE.pendingIntent=null;
-  STATE.height=null;
-  STATE.weight=null;
+  return true;
 }
 
 function intentRoute(raw){
@@ -286,6 +363,10 @@ function ask(text){
     return;
   }
 
+  if(STATE.pendingIntent==='body' && !/(身高|體重|腰[圍围]|bmi|公分|公斤|kg|男性|女性|男生|女生|^\s*\d{2,3}(?:\.\d+)?\s*$)/i.test(raw)){
+    resetBodyState();
+  }
+
   const matchedDrug=matchDrug(raw);
   if(matchedDrug){
     showDrug(matchedDrug.id);
@@ -336,10 +417,12 @@ async function loadData(){
 function startIntent(intent,echoUser=true){
   if(intent==='BMI'){
     if(echoUser) msg('📏 先看看自己的體位',true);
-    STATE.pendingIntent='bmi';
+    STATE.pendingIntent='body';
     STATE.height=null;
     STATE.weight=null;
-    msg('可以，直接輸入身高和體重就好，例如「身高170，體重80」或「170/80」。我會直接幫你算 BMI。');
+    STATE.sex=null;
+    STATE.waist=null;
+    msg('可以。直接輸入身高和體重，例如「身高170，體重80」或「170/80」，我會先算 BMI。\n\n如果想一起看腹部肥胖，也可以一次輸入「男，身高170，體重80，腰圍92」。');
     return;
   }
 
