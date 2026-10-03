@@ -1,6 +1,9 @@
 let KB=[];
 let DRUGS=[];
 
+const STATE={pendingIntent:null,height:null,weight:null};
+const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
+
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
 const EMERGENCY=['胸痛','呼吸困難','喘不過氣','昏倒','昏厥','意識不清','抽搐','吐血','黑便','持續嘔吐','吐不停'];
@@ -45,12 +48,142 @@ function matchDrug(raw){
  return DRUGS.find(d=>d.names.some(n=>s.includes(norm(n))))||null;
 }
 
-function show(item,fromBrowse=false){if(fromBrowse)msg(item.title,true);msg(item.soft);factCard(item);actionCard(item.action);if(item.id==='Q118')drugPanel();pills(relatedFor(item));document.getElementById('chat').scrollTop=document.getElementById('chat').scrollHeight;}
-function parseHW(raw){let s=raw.replace(/,/g,'.'),h=null,w=null,mh=s.match(/(?:身高)?\s*(\d{3}(?:\.\d+)?)\s*(?:公分|cm|CM)/),mw=s.match(/(?:體重)?\s*(\d{2,3}(?:\.\d+)?)\s*(?:公斤|kg|KG)/);if(mh)h=+mh[1];if(mw)w=+mw[1];if(!h||!w){let p=s.match(/(1\d{2}(?:\.\d+)?)\s*[\/、,，\s]+\s*(\d{2,3}(?:\.\d+)?)/);if(p){h=+p[1];w=+p[2]}}return h&&w&&h>=120&&h<=230&&w>=25&&w<=300?{h,w}:null;}
-function bmiReply(h,w){const bmi=w/Math.pow(h/100,2);let cls,next;if(bmi<18.5){cls='體重過輕';next='這時候不是再往下減，而是先確認營養與健康狀況。'}else if(bmi<24){cls='健康體位';next='如果腰圍偏大或健檢有三高，仍可以把腹部脂肪與代謝風險一起看。'}else if(bmi<27){cls='過重';next='可以先從能長期維持的飲食與活動調整開始。'}else{cls='肥胖';next='建議再搭配腰圍與相關疾病一起評估，而不是只看 BMI。'}msg(`我幫你算：${h} 公分、${w} 公斤，BMI 約 ${bmi.toFixed(1)}，依台灣成人標準屬於「${cls}」。\n\n${next}`);show(KB[43]);}
+function show(item,fromBrowse=false){
+  if(fromBrowse)msg(item.title,true);
+  if(item.id==='Q44') STATE.pendingIntent='bmi';
+  msg(item.soft);
+  factCard(item);
+  actionCard(item.action);
+  if(item.id==='Q118')drugPanel();
+  pills(relatedFor(item));
+  document.getElementById('chat').scrollTop=document.getElementById('chat').scrollHeight;
+}
+
+function parseMeasurements(raw){
+  const original=String(raw||'').trim();
+  const s=original.replace(/，/g,',');
+  const lower=s.toLowerCase();
+  let h=null,w=null;
+
+  // 明確單位：165 cm / 165公分 / 1.65 m
+  let mh=lower.match(/(?:身高\s*[:：]?\s*)?(\d{2,3}(?:\.\d+)?)\s*(?:cm|公分|厘米)/i);
+  if(mh) h=Number(mh[1]);
+
+  if(!h){
+    const mm=lower.match(/(?:身高\s*[:：]?\s*)?(1(?:\.\d{1,2})?)\s*(?:m|公尺|米)(?!m)/i);
+    if(mm) h=Number(mm[1])*100;
+  }
+
+  let mw=lower.match(/(?:體重\s*[:：]?\s*)?(\d{2,3}(?:\.\d+)?)\s*(?:kg|公斤|千克)/i);
+  if(mw) w=Number(mw[1]);
+
+  // 有標籤、沒單位：身高165 體重72
+  if(!h){
+    const m=s.match(/身高\s*[:：]?\s*(\d{2,3}(?:\.\d+)?)/i);
+    if(m) h=Number(m[1]);
+  }
+  if(!w){
+    const m=s.match(/體重\s*[:：]?\s*(\d{2,3}(?:\.\d+)?)/i);
+    if(m) w=Number(m[1]);
+  }
+
+  // 簡寫：165/72、165 72、165,72。排除明顯血壓語境。
+  if(!h&&!w&&!/(血壓|bp)/i.test(s)){
+    const pair=s.match(/^\s*(1\d{2}(?:\.\d+)?)\s*[\/、,，\s]+\s*(\d{2,3}(?:\.\d+)?)\s*$/);
+    if(pair){
+      h=Number(pair[1]);
+      w=Number(pair[2]);
+    }
+  }
+
+  // 正在等待 BMI 資料時，可下一句只輸入一個數字。
+  if(STATE.pendingIntent==='bmi'&&!h&&!w&&/^\s*\d{2,3}(?:\.\d+)?\s*$/.test(s)){
+    const n=Number(s.trim());
+    if(!STATE.height&&n>=120&&n<=230) h=n;
+    else if(!STATE.weight&&n>=25&&n<=300) w=n;
+  }
+
+  if(!(h>=120&&h<=230)) h=null;
+  if(!(w>=25&&w<=300)) w=null;
+  return {h,w};
+}
+
+function handleBMIInput(raw){
+  const m=parseMeasurements(raw);
+  if(!m.h&&!m.w) return false;
+
+  STATE.pendingIntent='bmi';
+  if(m.h) STATE.height=m.h;
+  if(m.w) STATE.weight=m.w;
+
+  if(STATE.height&&STATE.weight){
+    bmiReply(STATE.height,STATE.weight);
+    return true;
+  }
+
+  if(STATE.height&&!STATE.weight){
+    msg('收到，身高 '+STATE.height+' 公分。再告訴我體重就可以，例如「72 公斤」或直接輸入「72」。');
+    return true;
+  }
+
+  if(STATE.weight&&!STATE.height){
+    msg('收到，體重 '+STATE.weight+' 公斤。再告訴我身高就可以，例如「165 公分」或直接輸入「165」。');
+    return true;
+  }
+
+  return false;
+}
+
+function bmiReply(h,w){
+  const bmi=w/Math.pow(h/100,2);
+  let cls,next;
+  if(bmi<18.5){
+    cls='體重過輕';
+    next='這時候不建議再追求減重，反而要先確認營養與健康狀況。';
+  }else if(bmi<24){
+    cls='健康體位';
+    next='如果腰圍偏大或健檢有三高，仍可以把腹部脂肪與代謝風險一起看。';
+  }else if(bmi<27){
+    cls='過重';
+    next='可以先從能長期維持的飲食與活動調整開始。';
+  }else{
+    cls='肥胖';
+    next='建議再搭配腰圍與肥胖相關疾病一起評估，而不是只看 BMI。';
+  }
+
+  msg('我幫你算好了：'+h+' 公分、'+w+' 公斤，BMI 約 '+bmi.toFixed(1)+'，依台灣成人標準屬於「'+cls+'」。\n\n'+next);
+  const q44=KB.find(x=>x.id==='Q44');
+  if(q44) factCard(q44);
+  actionCard('如果方便，再量一次腰圍。男性 ≥90 公分、女性 ≥80 公分時，要多留意腹部肥胖與代謝風險。');
+  pills(['Q45','Q46','Q50'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
+
+  STATE.pendingIntent=null;
+  STATE.height=null;
+  STATE.weight=null;
+}
 
 function intentRoute(raw){
   const s=norm(raw);
+
+  // BMI／成人體位：先處理可執行功能，不讓它落入一般文字配對。
+  if(/(bmi|算.*胖|算.*體位|身高.*體重|體重.*身高|成人.*(過重|肥胖)|體位.*標準)/i.test(s))
+    return KB.find(x=>x.id==='Q44');
+
+  // 特殊族群先於一般關鍵字，避免「掉肌肉」被成人題吸走。
+  if(/(長輩|老人|高齡|65歲|70歲|75歲|80歲).*(減重|變瘦|體重).*(肌肉|沒力)|(肌肉|沒力).*(長輩|老人|高齡)/.test(s))
+    return KB.find(x=>x.id==='Q135');
+
+  if(/(減重手術|代謝手術).*(懷孕|生育)|(懷孕|生育).*(減重手術|代謝手術)/.test(s))
+    return KB.find(x=>x.id==='Q122');
+
+  if(/(復胖|胖回來|體重卡住|瘦不下來|減不下來|平台期)/.test(s))
+    return KB.find(x=>x.id==='Q108');
+
+  if(!/(小孩|孩子|兒童|青少年)/.test(s) && /(睡不好|睡不夠|睡眠不足|熬夜|晚睡|作息亂)/.test(s))
+    return KB.find(x=>x.id==='Q92');
+
+  if(/(脂肪肝).*(減重|體重|肥胖)|(減重|體重|肥胖).*(脂肪肝)/.test(s))
+    return KB.find(x=>x.id==='Q64');
 
   if (/(網路|網購|代購).*(減重藥|減肥藥|瘦瘦針|藥物|藥)|(減重藥|減肥藥|瘦瘦針|藥物|藥).*(網路|網購|代購)/.test(s))
     return KB.find(x=>x.id==='Q119');
@@ -73,10 +206,81 @@ function intentRoute(raw){
   return null;
 }
 
-function score(raw,it){const s=norm(raw);let n=0, t=norm(it.title);if(s===t)n+=100;if(s.includes(t)||t.includes(s))n+=16;it.keys.forEach(k=>{const x=norm(k);if(x&&s.includes(x))n+=Math.max(5,x.length*2)}); // bigram overlap
-for(let i=0;i<s.length-1;i++){const g=s.slice(i,i+2);if(t.includes(g))n+=.7}return n;}
-function searchKB(raw){return KB.map(x=>[score(raw,x),x]).sort((a,b)=>b[0]-a[0]);}
-function ask(text){const inp=document.getElementById('q'),raw=(text||inp.value).trim();if(!raw)return;inp.value='';msg(raw,true);if(EMERGENCY.some(k=>raw.includes(k))){msg('你提到的情況可能需要立即醫療評估。這個衛教工具不適合處理急症；若目前有胸痛、嚴重呼吸困難、昏厥、意識改變、抽搐或持續嘔吐，請立即就醫。');return;}const hw=parseHW(raw);if(hw){bmiReply(hw.h,hw.w);return;}const matchedDrug=matchDrug(raw);if(matchedDrug){showDrug(matchedDrug.id);return;}const routed=intentRoute(raw);if(routed){show(routed);return;}const ranked=searchKB(raw);if(ranked[0][0]>=5){show(ranked[0][1]);return;}msg('這個問題比較需要依個人狀況判斷，建議和醫師討論會比較合適。');}
+function score(raw,it){
+  const s=norm(raw),t=norm(it.title);
+  if(!s) return 0;
+  if(s===t) return 100;
+
+  let n=0;
+  if(s.length>=4 && (s.includes(t)||t.includes(s))) n+=30;
+
+  for(const k of (it.keys||[])){
+    const x=norm(k);
+    if(!x||!s.includes(x)) continue;
+    if(BROAD_KEYS.has(x)) n+=2;
+    else n+=x.length>=4?14:10;
+  }
+  return n;
+}
+
+function searchKB(raw){
+  return KB.map(x=>[score(raw,x),x]).sort((a,b)=>b[0]-a[0]);
+}
+
+function showCandidates(ranked){
+  const items=ranked.filter(x=>x[0]>0).slice(0,3).map(x=>x[1]);
+  if(!items.length) return false;
+  msg('這個問法可能對應到不只一個主題。為了不要答錯，你可以選最接近的一題：');
+  pills(items);
+  return true;
+}
+
+function ask(text){
+  const inp=document.getElementById('q');
+  const raw=(text||inp.value).trim();
+  if(!raw)return;
+  inp.value='';
+  msg(raw,true);
+
+  if(EMERGENCY.some(k=>raw.includes(k))){
+    msg('你提到的情況可能需要立即醫療評估。這個衛教工具不適合處理急症；若目前有胸痛、嚴重呼吸困難、昏厥、意識改變、抽搐或持續嘔吐，請立即就醫。');
+    return;
+  }
+
+  // 先處理 BMI 實際數值；可接受同一句或分兩次輸入。
+  if(handleBMIInput(raw)) return;
+
+  const matchedDrug=matchDrug(raw);
+  if(matchedDrug){
+    showDrug(matchedDrug.id);
+    return;
+  }
+
+  const routed=intentRoute(raw);
+  if(routed){
+    show(routed);
+    return;
+  }
+
+  const ranked=searchKB(raw);
+  if(ranked[0]&&ranked[0][0]>=10){
+    // 若前兩名同分，寧可讓民眾選，不要硬猜。
+    if(ranked[1]&&ranked[1][0]===ranked[0][0]){
+      showCandidates(ranked);
+      return;
+    }
+    show(ranked[0][1]);
+    return;
+  }
+
+  if(ranked[0]&&ranked[0][0]>0){
+    showCandidates(ranked);
+    return;
+  }
+
+  msg('這個問題比較需要依個人狀況判斷，建議和醫師討論會比較合適。');
+}
+
 function renderCats(){const el=document.getElementById('catlist');CATEGORIES.forEach((cat,i)=>{const b=document.createElement('button');b.className='catbtn';b.textContent=cat;b.onclick=()=>{document.querySelectorAll('.catbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderList(cat,document.getElementById('sideSearch').value)};el.appendChild(b)});}
 function renderList(cat=null,term=''){const list=document.getElementById('questionList');list.style.display='block';list.innerHTML='';const t=norm(term);let arr=KB.filter(x=>(!cat||x.cat===cat)&&(!t||norm(x.title+' '+x.keys.join(' ')).includes(t)));if(!arr.length){list.innerHTML='<div style="padding:8px;font-size:12px;color:#7a898f">沒有找到相符題目</div>';return;}arr.forEach(x=>{const b=document.createElement('button');b.className='qitem';b.innerHTML='<span class="qid">'+x.id+'</span>'+esc(x.title);b.onclick=()=>show(x,true);list.appendChild(b)});}
 
