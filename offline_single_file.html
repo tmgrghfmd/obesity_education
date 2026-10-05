@@ -56,7 +56,7 @@ footer{padding:11px 20px;border-top:1px solid var(--line);font-size:11.5px;color
 <body>
 <div class="shell">
 <header><div class="logo">聊</div><div><h1>一起聊聊健康體位</h1><p>2024 國健署《一起聊聊肥胖症：你該問的100+件事》Q1–Q139 完整涵蓋版</p></div></header>
-<div class="sourcebar"><b>主要資料來源：</b>衛生福利部國民健康署 2024《一起聊聊肥胖症：你該問的100+件事》。本工具依官方 <b>Q1–Q139</b> 逐題建立知識節點，回答為病人容易理解的摘要與重新表述，<b>不是官方原文逐字重製</b>。<span class="badge">139 個知識節點</span> <a href="https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12" target="_blank" rel="noopener">查看國健署資料</a><br><b>減重藥物更新：</b>臺大醫院健康電子報 2026 年 5 月〈減重藥物介紹〉，補充台灣目前核准用於長期體重控制之藥物。 <a href="https://epaper.ntuh.gov.tw/health/202605/project_3.html" target="_blank" rel="noopener">查看臺大醫院資料</a></div>
+<div class="sourcebar"><b>主要資料來源：</b>衛生福利部國民健康署 2024《一起聊聊肥胖症：你該問的100+件事》。本工具依官方 <b>Q1–Q139</b> 逐題建立知識節點，回答為病人容易理解的摘要與重新表述，<b>不是官方原文逐字重製</b>。<span class="badge">139 個知識節點</span> <a href="https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12" target="_blank" rel="noopener">查看國健署資料</a><br><b>減重藥物資訊：</b>依台灣核准藥品資訊、相關臨床指引及本網站醫療專業整理；實際適應症、禁忌症、劑量與使用方式仍以 TFDA 核准仿單及醫師評估為準。</div>
 <div class="layout">
 <aside>
 <div class="asideTitle">今天比較想聊哪一件事？</div>
@@ -102,7 +102,7 @@ function drugPanel(){
  const c=document.getElementById('chat'),d=document.createElement('div');
  d.className='drugPanel';
  d.innerHTML='<div class="drugPanelTitle">💊 台灣核准的長期減重藥物</div>'+
- '<div class="drugPanelSub">依臺大醫院 2026 年 5 月資料整理。點選藥物可看簡要介紹。該資料指出目前這 5 種皆無健保給付，需經醫師評估後自費使用。</div>'+
+ '<div class="drugPanelSub">依台灣核准藥品資訊與本網站專業整理。點選藥物可看簡要介紹。該資料指出目前這 5 種皆無健保給付，需經醫師評估後自費使用。</div>'+
  '<div class="drugGrid">'+DRUGS.map(x=>'<button class="drugCard" data-drug="'+x.id+'"><div class="drugName">'+x.title+'</div><div class="drugMeta">'+x.route+'</div></button>').join('')+'</div>'+
  '<div class="drugWarn"><b>共同提醒：</b>懷孕或哺乳期間不建議使用減重輔助藥物；減重藥仍需搭配飲食、活動與長期追蹤。</div>';
  c.appendChild(d);
@@ -119,7 +119,7 @@ function showDrug(id,echo=false){
  '<p><span class="drugLabel">主要作用：</span>'+drug.mechanism+'</p>'+
  '<p><span class="drugLabel">常見副作用：</span>'+drug.common+'</p>'+
  '<p><span class="drugLabel">重要注意事項：</span>'+drug.caution+'</p>'+
- '<div class="sourceQ"><b>藥物更新資料</b><span>｜臺大醫院健康電子報 2026-05</span><a href="https://epaper.ntuh.gov.tw/health/202605/project_3.html" target="_blank" rel="noopener">查看原始資料</a></div>'+
+ '<div class="sourceQ"><b>藥物更新資料</b><span>｜本網站藥物資訊整理</span><a href="" target="_blank" rel="noopener">查看原始資料</a></div>'+
  '<div class="drugWarn">若你是想問「我適不適合用這個藥」或「我該用多少劑量」，這個問題比較需要依個人狀況判斷，建議和醫師討論會比較合適。</div>';
  c.appendChild(d);
  const qs=[KB.find(x=>x.id==='Q118'),KB.find(x=>x.id==='Q120'),KB.find(x=>x.id==='Q119')];
