@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261003-8';
+const BUILD_VERSION='20261005-1';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -28,9 +28,9 @@ function drugPanel(){
  const c=document.getElementById('chat'),d=document.createElement('div');
  d.className='drugPanel';
  d.innerHTML='<div class="drugPanelTitle">💊 台灣核准的長期減重藥物</div>'+
- '<div class="drugPanelSub">依臺大醫院 2026 年 5 月資料整理。點選藥物可看簡要介紹。該資料指出目前這 5 種皆無健保給付，需經醫師評估後自費使用。</div>'+
+ '<div class="drugPanelSub">依台灣核准藥品資訊與本網站專業整理。點選藥物可看簡要介紹；實際適應症、禁忌症、劑量與用法以 TFDA 核准仿單及醫師評估為準。</div>'+
  '<div class="drugGrid">'+DRUGS.map(x=>'<button class="drugCard" data-drug="'+x.id+'"><div class="drugName">'+x.title+'</div><div class="drugMeta">'+x.route+'</div></button>').join('')+'</div>'+
- '<div class="drugWarn"><b>共同提醒：</b>懷孕或哺乳期間不建議使用減重輔助藥物；減重藥仍需搭配飲食、活動與長期追蹤。</div>';
+ '<div class="drugWarn"><b>共同提醒：</b>懷孕或哺乳期間不建議使用減重輔助藥物；減重藥仍需搭配飲食、活動與長期追蹤。<br><br><b>非核准減重適應症提醒：</b>Phentermine（芬特明／芬他命）目前在台灣沒有核准的減重適應症，因此不列入上述台灣核准減重藥物清單。</div>';
  c.appendChild(d);
  d.querySelectorAll('[data-drug]').forEach(b=>b.onclick=()=>showDrug(b.dataset.drug,true));
  c.scrollTop=c.scrollHeight;
@@ -45,13 +45,34 @@ function showDrug(id,echo=false){
  '<p><span class="drugLabel">主要作用：</span>'+drug.mechanism+'</p>'+
  '<p><span class="drugLabel">常見副作用：</span>'+drug.common+'</p>'+
  '<p><span class="drugLabel">重要注意事項：</span>'+drug.caution+'</p>'+
- '<div class="sourceQ"><b>藥物更新資料</b><span>｜臺大醫院健康電子報 2026-05</span><a href="https://epaper.ntuh.gov.tw/health/202605/project_3.html" target="_blank" rel="noopener">查看原始資料</a></div>'+
+ '<div class="sourceQ"><b>藥物資訊整理</b><span>｜依台灣核准藥品資訊與相關臨床指引整理；以 TFDA 核准仿單為準</span></div>'+
  '<div class="drugWarn">若你是想問「我適不適合用這個藥」或「我該用多少劑量」，這個問題比較需要依個人狀況判斷，建議和醫師討論會比較合適。</div>';
  c.appendChild(d);
  const qs=[KB.find(x=>x.id==='Q118'),KB.find(x=>x.id==='Q120'),KB.find(x=>x.id==='Q119')];
  pills(qs);
  c.scrollTop=c.scrollHeight;
 }
+
+function showPhentermineNotice(){
+  msg('Phentermine（芬特明／芬他命）在部分國家可作為減重藥物使用，但目前在台灣沒有核准的減重適應症，所以不列在台灣核准減重藥物清單中。');
+  const c=document.getElementById('chat'),d=document.createElement('div');
+  d.className='drugDetail';
+  d.innerHTML=
+    '<h3>Phentermine（芬特明／芬他命）</h3>'+
+    '<p><span class="drugLabel">台灣狀態：</span>目前沒有核准的減重適應症。</p>'+
+    '<p><span class="drugLabel">衛教提醒：</span>不同國家的核准狀況可能不同，不應因國外資訊或網路分享而自行取得或使用。</p>'+
+    '<div class="sourceQ"><b>藥物資訊整理</b><span>｜實際核准狀態與適應症以 TFDA 最新核准資料為準</span></div>'+
+    '<div class="drugWarn">若你是想問「我能不能使用 phentermine」，這屬於個別醫療與用藥評估，建議直接和醫師討論。</div>';
+  c.appendChild(d);
+  const qs=[KB.find(x=>x.id==='Q118'),KB.find(x=>x.id==='Q119'),KB.find(x=>x.id==='Q121')].filter(Boolean);
+  pills(qs);
+  c.scrollTop=c.scrollHeight;
+}
+function isPhentermineQuery(raw){
+  const s=norm(raw);
+  return /(phentermine|芬特明|芬他命)/i.test(s);
+}
+
 function matchDrug(raw){
  const s=norm(raw);
  return DRUGS.find(d=>d.names.some(n=>s.includes(norm(n))))||null;
@@ -509,6 +530,11 @@ function ask(text){
   const conversational=conversationIntentRoute(raw);
   if(conversational){
     showConversationIntent(conversational);
+    return;
+  }
+
+  if(isPhentermineQuery(raw)){
+    showPhentermineNotice();
     return;
   }
 
