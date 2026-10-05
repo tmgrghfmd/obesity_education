@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261005-2';
+const BUILD_VERSION='20261005-3';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -653,6 +653,11 @@ function startIntent(intent,echoUser=true){
     if(echoUser) msg('👵 長輩／肌少肥胖',true);
     msg('長輩的體重管理除了公斤數，也要一起看肌肉、營養和功能。你比較想了解哪一件事？');
     pills(['Q132','Q134','Q135','Q138'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
+    return;
+  }
+
+  if(intent==='ADOLESCENT_DRUGS'){
+    showAdolescentDrugPanel(echoUser);
     return;
   }
 
