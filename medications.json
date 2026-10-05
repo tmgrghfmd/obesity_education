@@ -11,7 +11,12 @@
     "route": "口服｜隨含脂肪的餐食使用",
     "mechanism": "抑制腸胃道脂肪分解酵素，減少部分膳食脂肪吸收。",
     "common": "常見為油便、排便急迫、排便次數增加、脹氣等。",
-    "caution": "慢性吸收不良症或膽汁鬱滯者不適合；也可能影響脂溶性維生素 A、D、E、K 的吸收。"
+    "caution": "慢性吸收不良症或膽汁鬱滯者不適合；也可能影響脂溶性維生素 A、D、E、K 的吸收。",
+    "adolescentApproved": true,
+    "adolescentLabel": "青少年可使用",
+    "adolescentEligibility": "肥胖青少年；仿單載明僅在至少 6 個月以上、包含符合年齡之均衡飲食與行為／運動計畫仍未達成效時，才考慮使用。12 歲以下缺乏臨床研究。",
+    "adolescentReassess": "使用約 12 週後若仍沒有體重下降，應回診重新評估是否有繼續治療的必要。",
+    "adolescentNote": "使用時仍需搭配低熱量、低脂且營養均衡的飲食；也要留意脂溶性維生素吸收與腸胃道副作用。"
   },
   {
     "id": "naltrexone_bupropion",
@@ -27,7 +32,12 @@
     "route": "口服",
     "mechanism": "作用於中樞食慾與獎賞相關路徑，幫助增加飽足感、減少食物攝取。",
     "common": "常見噁心、便秘、頭痛、嘔吐；可能使血壓或心跳上升。",
-    "caution": "未控制高血壓、癲癇、部分精神疾病、暴食症／厭食症、長期使用鴉片類藥物者等需避免或特別評估；不可和 MAOI 併用。"
+    "caution": "未控制高血壓、癲癇、部分精神疾病、暴食症／厭食症、長期使用鴉片類藥物者等需避免或特別評估；不可和 MAOI 併用。",
+    "adolescentApproved": false,
+    "adolescentLabel": "台灣青少年減重適應症：未核准",
+    "adolescentEligibility": "目前台灣核准的體重控制適應症為成人。",
+    "adolescentReassess": "",
+    "adolescentNote": "青少年不應直接套用成人減重藥物適應症。"
   },
   {
     "id": "liraglutide",
@@ -41,7 +51,12 @@
     "route": "每日皮下注射",
     "mechanism": "GLP-1 受體促效劑，可增加飽足感、降低食慾並延緩胃排空。",
     "common": "常見噁心、腹痛、腹瀉、嘔吐、便秘或消化不良等腸胃道症狀。",
-    "caution": "本人或家族有甲狀腺髓質癌，或第二型多發性內分泌腫瘤症候群（MEN2）者禁止使用；通常需由低劑量逐步增加。"
+    "caution": "本人或家族有甲狀腺髓質癌，或第二型多發性內分泌腫瘤症候群（MEN2）者禁止使用；通常需由低劑量逐步增加。",
+    "adolescentApproved": true,
+    "adolescentLabel": "12 歲以上青少年可使用",
+    "adolescentEligibility": "適用於 12 歲以上、肥胖症（依 IOTF 年齡與性別分界，BMI 相當於成人 BMI ≥30 kg/m²）且體重超過 60 kg 的青少年，作為均衡飲食與增加體能活動的輔助治療。",
+    "adolescentReassess": "每天 3.0 mg 或最高耐受劑量治療 12 週後，若 BMI 或 BMI 標準分數未下降至少 4%，應停止治療並重新評估。",
+    "adolescentNote": "須循序增加劑量並依耐受度調整；常見噁心、嘔吐、腹瀉、便秘等腸胃道症狀。"
   },
   {
     "id": "semaglutide",
@@ -55,7 +70,12 @@
     "route": "每週皮下注射",
     "mechanism": "GLP-1 受體促效劑，可增加飽足感、降低食慾並延緩胃排空。",
     "common": "常見噁心、腹痛、腹瀉、嘔吐、便秘或消化不良等腸胃道症狀。",
-    "caution": "本人或家族有甲狀腺髓質癌，或 MEN2 者禁止使用；通常需由低劑量逐步增加。"
+    "caution": "本人或家族有甲狀腺髓質癌，或 MEN2 者禁止使用；通常需由低劑量逐步增加。",
+    "adolescentApproved": true,
+    "adolescentLabel": "12 歲以上青少年可使用",
+    "adolescentEligibility": "適用於 12 歲以上、合併肥胖且體重超過 60 kg 的青少年，作為低熱量飲食與增加體能活動的輔助治療。",
+    "adolescentReassess": "以 2.4 mg 或最高耐受劑量治療 12 週後，若 BMI 未下降至少 5%，應停止治療並重新評估。",
+    "adolescentNote": "每週注射一次，需依仿單逐步增加劑量；常見噁心、嘔吐、腹瀉、便秘等腸胃道症狀。"
   },
   {
     "id": "tirzepatide",
@@ -69,6 +89,11 @@
     "route": "每週皮下注射",
     "mechanism": "同時作用於 GIP 與 GLP-1 受體，幫助增加飽足感、降低食慾並調節代謝。",
     "common": "常見噁心、嘔吐、腹瀉、便秘、腹脹、胃食道逆流或消化不良等。",
-    "caution": "本人或家族有甲狀腺髓質癌，或 MEN2 者禁止使用；通常需由低劑量逐步增加。"
+    "caution": "本人或家族有甲狀腺髓質癌，或 MEN2 者禁止使用；通常需由低劑量逐步增加。",
+    "adolescentApproved": false,
+    "adolescentLabel": "台灣青少年減重適應症：未核准",
+    "adolescentEligibility": "目前台灣核准的體重控制適應症為成人。",
+    "adolescentReassess": "",
+    "adolescentNote": "青少年不應直接套用成人減重藥物適應症。"
   }
 ]
