@@ -1692,8 +1692,8 @@
       "口服減重藥"
     ],
     "soft": "如果你想知道「台灣目前有哪些核准的減重藥」，這題可以直接列給你看。",
-    "core": "依臺大醫院 2026 年 5 月整理，台灣目前核准用於長期體重控制的藥物共有 5 種：口服 orlistat、naltrexone/bupropion，以及注射 liraglutide、semaglutide、tirzepatide。是否適合使用仍需由醫師依 BMI、肥胖相關疾病、禁忌症與目前用藥評估。",
-    "action": "可以先看下面 5 種藥物的差異；不要自行購買、借用別人的藥或自行調整劑量。"
+    "core": "目前台灣核准用於長期體重控制的藥物包括口服 orlistat、naltrexone/bupropion，以及注射 liraglutide、semaglutide、tirzepatide。是否適合使用仍需由醫師依 BMI、肥胖相關疾病、禁忌症與目前用藥評估；實際適應症與用法以 TFDA 核准仿單為準。",
+    "action": "可以先看下面 5 種核准藥物的差異；不要自行購買、借用別人的藥或自行調整劑量。另有些國外常見的減重藥，在台灣並沒有核准減重適應症。"
   },
   {
     "id": "Q119",
