@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261005-1';
+const BUILD_VERSION='20261005-2';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -28,13 +28,38 @@ function drugPanel(){
  const c=document.getElementById('chat'),d=document.createElement('div');
  d.className='drugPanel';
  d.innerHTML='<div class="drugPanelTitle">💊 台灣核准的長期減重藥物</div>'+
- '<div class="drugPanelSub">依台灣核准藥品資訊與本網站專業整理。點選藥物可看簡要介紹；實際適應症、禁忌症、劑量與用法以 TFDA 核准仿單及醫師評估為準。</div>'+
- '<div class="drugGrid">'+DRUGS.map(x=>'<button class="drugCard" data-drug="'+x.id+'"><div class="drugName">'+x.title+'</div><div class="drugMeta">'+x.route+'</div></button>').join('')+'</div>'+
+ '<div class="drugPanelSub">依台灣核准藥品資訊與本網站專業整理。成人與青少年的核准適應症不同；點選藥物可看個別說明。實際適應症、禁忌症、劑量與用法以 TFDA 核准仿單及醫師評估為準。</div>'+
+ '<div class="drugGrid">'+DRUGS.map(x=>'<button class="drugCard" data-drug="'+x.id+'"><div class="drugName">'+x.title+'</div><div class="drugMeta">'+x.route+'</div>'+(x.adolescentApproved?'<div class="drugMeta" style="margin-top:4px;font-weight:800;color:var(--green)">✓ 青少年仿單適應症</div>':'')+'</button>').join('')+'</div>'+
  '<div class="drugWarn"><b>共同提醒：</b>懷孕或哺乳期間不建議使用減重輔助藥物；減重藥仍需搭配飲食、活動與長期追蹤。<br><br><b>非核准減重適應症提醒：</b>Phentermine（芬特明／芬他命）目前在台灣沒有核准的減重適應症，因此不列入上述台灣核准減重藥物清單。</div>';
  c.appendChild(d);
  d.querySelectorAll('[data-drug]').forEach(b=>b.onclick=()=>showDrug(b.dataset.drug,true));
  c.scrollTop=c.scrollHeight;
 }
+
+function showAdolescentDrugPanel(echo=true){
+  if(echo) msg('青少年可以用哪些減重藥？',true);
+  msg('可以，但青少年不能直接套用成人的減重藥適應症。依台灣目前核准仿單，青少年可考慮的減重藥主要有 Orlistat、Liraglutide 與 Semaglutide，而且每一種都有自己的使用條件與療效停損點。');
+
+  const items=DRUGS.filter(x=>x.adolescentApproved);
+  const c=document.getElementById('chat'),d=document.createElement('div');
+  d.className='drugPanel';
+  d.innerHTML='<div class="drugPanelTitle">🧒 台灣青少年核准減重藥物</div>'+
+    '<div class="drugPanelSub">藥物只能作為飲食、活動與行為介入的輔助。是否適合使用，仍需由熟悉兒童青少年肥胖的醫師依生長、BMI、共病與仿單條件評估。</div>'+
+    '<div class="drugGrid">'+items.map(x=>
+      '<button class="drugCard" data-drug="'+x.id+'"><div class="drugName">'+x.title+'</div>'+
+      '<div class="drugMeta">'+esc(x.adolescentLabel||'')+'</div>'+
+      '<div class="drugMeta" style="margin-top:5px">'+esc(x.adolescentReassess||'')+'</div></button>'
+    ).join('')+'</div>'+
+    '<div class="drugWarn"><b>效果不佳不是一直撐：</b><br>'+
+      'Liraglutide：維持／最高耐受劑量 12 週後，BMI 或 BMI 標準分數未下降至少 4% → 停藥並重新評估。<br>'+
+      'Semaglutide：2.4 mg 或最高耐受劑量 12 週後，BMI 未下降至少 5% → 停藥並重新評估。<br>'+
+      'Orlistat：原則上是在至少 6 個月生活型態治療仍失敗後才考慮；使用約 12 週仍無體重下降時應回診重新評估。</div>';
+  c.appendChild(d);
+  d.querySelectorAll('[data-drug]').forEach(b=>b.onclick=()=>showDrug(b.dataset.drug,true));
+  pills(['Q20','Q30','Q42'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
+  c.scrollTop=c.scrollHeight;
+}
+
 function showDrug(id,echo=false){
  const drug=DRUGS.find(x=>x.id===id); if(!drug)return;
  if(echo)msg(drug.title,true);
@@ -45,6 +70,10 @@ function showDrug(id,echo=false){
  '<p><span class="drugLabel">主要作用：</span>'+drug.mechanism+'</p>'+
  '<p><span class="drugLabel">常見副作用：</span>'+drug.common+'</p>'+
  '<p><span class="drugLabel">重要注意事項：</span>'+drug.caution+'</p>'+
+    '<div class="drugWarn"><b>青少年使用：</b> '+esc(drug.adolescentLabel||'')+'<br>'+esc(drug.adolescentEligibility||'')+
+    (drug.adolescentReassess?'<br><br><b>效果不佳時：</b> '+esc(drug.adolescentReassess):'')+
+    (drug.adolescentNote?'<br><br><b>補充：</b> '+esc(drug.adolescentNote):'')+
+    '</div>'+
  '<div class="sourceQ"><b>藥物資訊整理</b><span>｜依台灣核准藥品資訊與相關臨床指引整理；以 TFDA 核准仿單為準</span></div>'+
  '<div class="drugWarn">若你是想問「我適不適合用這個藥」或「我該用多少劑量」，這個問題比較需要依個人狀況判斷，建議和醫師討論會比較合適。</div>';
  c.appendChild(d);
@@ -423,6 +452,11 @@ function conversationIntentRoute(raw){
 function intentRoute(raw){
   const s=norm(raw);
 
+  // 青少年減重藥物專屬路由
+  if(/(青少年|兒童|小孩|12歲|13歲|14歲|15歲|16歲|17歲).*(減重藥|減肥藥|瘦瘦針|藥物)|(減重藥|減肥藥|瘦瘦針).*(青少年|兒童|小孩|12歲|13歲|14歲|15歲|16歲|17歲)/.test(s))
+    return {id:'ADOLESCENT_DRUGS'};
+
+
   // 減重後月經／經期異常：生活化說法優先直接命中 Q71。
   if(/(減重|減肥|瘦了|體重下降|吃太少|節食|運動太多).*(月經亂|經期亂|月經不規則|月經不來|沒月經|停經|mc亂|生理期亂)|(月經亂|經期亂|月經不規則|月經不來|沒月經|停經|mc亂|生理期亂).*(減重|減肥|瘦了|體重下降|吃太少|節食|運動太多)/.test(s))
     return KB.find(x=>x.id==='Q71');
@@ -546,6 +580,10 @@ function ask(text){
 
   const routed=intentRoute(raw);
   if(routed){
+    if(routed.id==='ADOLESCENT_DRUGS'){
+      showAdolescentDrugPanel(false);
+      return;
+    }
     show(routed);
     return;
   }
