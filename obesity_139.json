@@ -1689,11 +1689,16 @@
       "glp1",
       "glp-1",
       "wegovy",
-      "口服減重藥"
+      "口服減重藥",
+      "青少年減重藥",
+      "青少年瘦瘦針",
+      "小孩減重藥",
+      "12歲減重藥",
+      "兒童減重藥"
     ],
     "soft": "如果你想知道「台灣目前有哪些核准的減重藥」，這題可以直接列給你看。",
-    "core": "目前台灣核准用於長期體重控制的藥物包括口服 orlistat、naltrexone/bupropion，以及注射 liraglutide、semaglutide、tirzepatide。是否適合使用仍需由醫師依 BMI、肥胖相關疾病、禁忌症與目前用藥評估；實際適應症與用法以 TFDA 核准仿單為準。",
-    "action": "可以先看下面 5 種核准藥物的差異；不要自行購買、借用別人的藥或自行調整劑量。另有些國外常見的減重藥，在台灣並沒有核准減重適應症。"
+    "core": "目前台灣核准用於長期體重控制的藥物包括 orlistat、naltrexone/bupropion、liraglutide、semaglutide、tirzepatide。青少年可用的核准選項並不相同：目前以 orlistat、liraglutide、semaglutide 為主，且各自有年齡、體重或先行生活型態治療條件。",
+    "action": "成人與青少年適應症不同。青少年使用藥物前應先確認是否符合仿單條件，並在治療後依仿單規定評估療效；效果不足時不應只是一直加藥或硬撐。"
   },
   {
     "id": "Q119",
