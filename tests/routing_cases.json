@@ -120,9 +120,9 @@
     "expected": "Q107"
   },
   {
-    "kind": "route",
+    "kind": "conversation",
     "input": "卡關",
-    "expected": "Q108"
+    "expected": "weight_plateau_colloquial"
   },
   {
     "kind": "route",
