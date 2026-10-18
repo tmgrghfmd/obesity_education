@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261018-1';
+const BUILD_VERSION='20261018-2';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -418,7 +418,61 @@ const CONVERSATION_INTENTS=[
     refs:['Q48','Q108'],
     follow:['一天什麼時間量體重最準？','體重突然增加一定是吃太多嗎？','平台期怎麼辦？']
   }
-];
+,
+  {
+    id:'cravings_snacking',
+    test:s=>/(嘴饞|一直想吃|忍不住吃|一直吃零食|零食停不下來|看到東西就想吃)/.test(s),
+    lead:'如果是一直嘴饞或忍不住想吃，先不用把它全部歸咎於意志力。',
+    body:'飢餓、飲食限制、壓力、習慣和環境都可能讓人更容易想吃。體重管理除了食物本身，也要找出最常觸發進食的情境。',
+    action:'先觀察幾天：最容易嘴饞是在什麼時間、什麼心情、什麼地方？如果白天吃太少，也要先把正餐調整好。',
+    refs:['Q73','Q107','Q117'],
+    follow:['我壓力大就一直吃','減肥一直很餓怎麼辦？','我又破戒了怎麼辦？']
+  },
+  {
+    id:'cheat_guilt',
+    test:s=>/(破戒|吃爆|爆吃|大吃一頓|週末失控|前功盡棄|昨天吃太多)/.test(s) && !/(暴食症|binge)/.test(s),
+    lead:'一次吃多了不代表前面的努力全部歸零，也不需要隔天用極端節食來「補償」。',
+    body:'節日、聚餐或生活事件本來就可能讓飲食暫時偏離計畫。長期體重管理看的是大多數時間的習慣，不是某一餐。',
+    action:'下一餐回到原本的正常飲食就好；如果這種失控很頻繁，再回頭看是不是平常限制得太嚴或壓力太大。',
+    refs:['Q93','Q111','Q113'],
+    follow:['聚餐怎麼吃？','我一直失敗很挫折','壓力大就想吃怎麼辦？']
+  },
+  {
+    id:'emotional_eating',
+    test:s=>/(壓力大|心情不好|焦慮|煩|難過).*(一直吃|想吃|亂吃|吃東西|嘴饞)|(情緒性進食|靠吃紓壓|靠吃舒壓)/.test(s),
+    lead:'如果壓力或情緒一來就特別想吃，這不只是「忍不住」而已。',
+    body:'情緒、壓力與飲食行為會互相影響。找出觸發點、調整全有全無的想法，往往比只要求自己少吃更實際。',
+    action:'先把「真的餓」和「想靠吃東西放鬆」分開記錄；如果反覆失控或很困擾，可以把心理支持一起放進體重治療。',
+    refs:['Q113','Q117'],
+    follow:['我是不是意志力太差？','有暴食症還能減重嗎？','減重心理治療有用嗎？']
+  },
+  {
+    id:'eating_too_little_plateau',
+    test:s=>/(吃很少|沒吃什麼|幾乎沒吃|一天只吃一點).*(瘦不下來|體重不動|還是胖|沒變|卡住)|(瘦不下來|體重不動|還是胖).*(吃很少|沒吃什麼|幾乎沒吃)/.test(s),
+    lead:'如果已經吃得很少但體重還是卡住，先不要再把飲食砍得更低。',
+    body:'體重會受到水分、活動量、睡眠、飲食內容和身體適應影響；熱量過低也不等於一定比較容易長期減重。',
+    action:'先記錄 3–7 天的實際飲食、飲料、活動與睡眠，再看 2–4 週體重與腰圍趨勢，比繼續挨餓更有用。',
+    refs:['Q72','Q73','Q108'],
+    follow:['平台期怎麼辦？','一天到底要吃多少？','減肥一定要餓嗎？']
+  },
+  {
+    id:'sugarfree_drink',
+    test:s=>/(無糖飲料|零卡飲料|代糖飲料).*(隨便喝|一直喝|沒關係|會胖|可以嗎)|(無糖就沒關係|零卡就沒關係)/.test(s),
+    lead:'「無糖」確實少了糖，但不代表所有飲品都可以完全不看份量或內容。',
+    body:'飲料要看的是整體成分與熱量；例如無糖燕麥奶仍有熱量與碳水化合物。白開水仍是最單純的日常飲品。',
+    action:'先看營養標示和份量；如果只是口渴，白開水最簡單。其他無糖飲品可以依整體飲食安排。',
+    refs:['Q72','Q88'],
+    follow:['無糖燕麥奶可以喝嗎？','含糖飲料怎麼戒？','一天吃多少熱量？']
+  },
+  {
+    id:'weightloss_drug_magic',
+    test:s=>/(瘦瘦針|減重藥|減肥藥).*(打一打就好|吃藥就好|不用運動|不用控制|不用管飲食|就會瘦)/.test(s),
+    lead:'減重藥可以幫忙，但不是用了之後其他事情都不用管。',
+    body:'藥物是完整體重治療的一部分，不能取代飲食、活動、睡眠與長期生活型態；治療期間也要留意營養與肌肉。',
+    action:'把藥物當成增加成功機會的工具，而不是唯一方法；是否適合、效果如何與何時調整，都要定期和醫療團隊評估。',
+    refs:['Q118','Q120'],
+    follow:['台灣有哪些核准減重藥？','停藥會不會復胖？','用了藥還要控制飲食嗎？']
+  }];
 
 function showConversationIntent(ci){
   msg(ci.lead);
@@ -515,19 +569,81 @@ function intentRoute(raw){
   return null;
 }
 
+
+function inferAudience(raw){
+  const s=norm(raw);
+  if(/(懷孕|孕婦|孕期|妊娠|產後|寶寶|嬰兒|配方奶|母乳)/.test(s)) return 'pregnancy';
+  if(/(小孩|孩子|兒童|青少年|學童|學生|國小|國中|高中|青春期|7歲|8歲|9歲|10歲|11歲|12歲|13歲|14歲|15歲|16歲|17歲)/.test(s)) return 'child';
+  if(/(長輩|老人|高齡|65歲|70歲|75歲|80歲|85歲|衰弱)/.test(s)) return 'older';
+  return 'adult';
+}
+
+function inferTopic(raw){
+  const s=norm(raw);
+  if(/(減重藥|減肥藥|瘦瘦針|glp1|wegovy|saxenda|mounjaro|orlistat|contrave|藥物)/.test(s)) return 'drug';
+  if(/(減重手術|代謝手術|縮胃|胃繞道|手術|抽脂|冷凍減脂)/.test(s)) return 'surgery';
+  if(/(吃|飲食|外食|便當|熱量|卡路里|澱粉|蛋白質|早餐|宵夜|珍奶|手搖|零食|水果|蔬菜)/.test(s)) return 'diet';
+  if(/(運動|走路|重訓|肌力|瑜伽|hiit|跑步|游泳|伸展|拉筋)/.test(s)) return 'exercise';
+  if(/(挫折|壓力|情緒|意志力|暴食|自責|失敗|卡關|停滯|復胖)/.test(s)) return 'psych';
+  return null;
+}
+
+function categoryAffinity(item,raw){
+  const audience=inferAudience(raw);
+  const topic=inferTopic(raw);
+  let n=0;
+
+  if(audience==='pregnancy') n += item.cat==='孕期與嬰兒'?12:-6;
+  else if(audience==='child') n += item.cat==='兒童青少年'?12:-5;
+  else if(audience==='older') n += item.cat==='高齡體重管理'?12:-5;
+  else {
+    // 成人的一般問法，不應因為只有「肥胖／減重」就跑到孕期或兒少題。
+    if(item.cat==='孕期與嬰兒'||item.cat==='兒童青少年'||item.cat==='高齡體重管理') n-=4;
+  }
+
+  if(topic==='drug' && item.cat==='藥物與手術') n+=6;
+  if(topic==='surgery' && item.cat==='藥物與手術') n+=7;
+  if(topic==='diet' && item.cat==='飲食與活動') n+=5;
+  if(topic==='exercise' && item.cat==='飲食與活動') n+=5;
+  if(topic==='psych' && item.cat==='心理與維持') n+=5;
+  return n;
+}
+
+function directKeyRoute(raw){
+  const s=norm(raw);
+  let best=null,bestLen=0,tied=false;
+
+  for(const item of KB){
+    for(const key of (item.keys||[])){
+      const k=norm(key);
+      if(!k||BROAD_KEYS.has(k)||k.length<3) continue;
+      if(s.includes(k)){
+        if(k.length>bestLen){
+          best=item; bestLen=k.length; tied=false;
+        }else if(k.length===bestLen && best && best.id!==item.id){
+          tied=true;
+        }
+      }
+    }
+  }
+  return tied?null:best;
+}
+
 function score(raw,it){
   const s=norm(raw),t=norm(it.title);
   if(!s) return 0;
   if(s===t) return 100;
 
-  let n=0;
+  let n=categoryAffinity(it,raw);
   if(s.length>=4 && (s.includes(t)||t.includes(s))) n+=30;
 
   for(const k of (it.keys||[])){
     const x=norm(k);
     if(!x||!s.includes(x)) continue;
-    if(BROAD_KEYS.has(x)) n+=2;
-    else n+=x.length>=4?14:10;
+    if(BROAD_KEYS.has(x)) n+=1;
+    else if(x.length>=6) n+=18;
+    else if(x.length>=4) n+=14;
+    else n+=9;
   }
   return n;
 }
@@ -539,7 +655,7 @@ function searchKB(raw){
 function showCandidates(ranked){
   const items=ranked.filter(x=>x[0]>0).slice(0,3).map(x=>x[1]);
   if(!items.length) return false;
-  msg('這個問法可能對應到不只一個主題。為了不要答錯，你可以選最接近的一題：');
+  msg('我找到幾個可能相關的主題，你可以選最接近你想問的一題：');
   pills(items);
   return true;
 }
@@ -597,6 +713,12 @@ function ask(text){
       return;
     }
     show(routed);
+    return;
+  }
+
+  const direct=directKeyRoute(raw);
+  if(direct){
+    show(direct);
     return;
   }
 
