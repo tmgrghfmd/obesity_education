@@ -1,0 +1,28 @@
+name: Routing regression tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'chatbot.js'
+      - 'obesity_139.json'
+      - 'medications.json'
+      - 'tests/**'
+      - '.github/workflows/routing-tests.yml'
+  pull_request:
+    paths:
+      - 'chatbot.js'
+      - 'obesity_139.json'
+      - 'medications.json'
+      - 'tests/**'
+
+jobs:
+  routing-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run chatbot routing regression
+        run: node tests/test-routing.js
