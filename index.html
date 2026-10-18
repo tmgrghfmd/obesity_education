@@ -7,15 +7,16 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>一起聊聊健康體位｜2024 國健署 139 問完整衛教 Chatbot</title>
-<link rel="stylesheet" href="style.css?v=20261018-4">
+<link rel="stylesheet" href="style.css?v=20261018-5">
 </head>
 <body>
 <div class="shell">
-<header><div class="logo">聊</div><div><h1>一起聊聊健康體位</h1><p>2024 國健署《一起聊聊肥胖症：你該問的100+件事》Q1–Q139 完整涵蓋版</p></div></header>
-<div class="sourcebar"><b>主要資料來源：</b>衛生福利部國民健康署 2024《一起聊聊肥胖症：你該問的100+件事》。本工具依官方 <b>Q1–Q139</b> 逐題建立知識節點，回答為病人容易理解的摘要與重新表述，<b>不是官方原文逐字重製</b>。<span class="badge">139 個知識節點</span> <a href="https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12" target="_blank" rel="noopener">查看國健署資料</a><br><b>減重藥物資訊：</b>依台灣核准藥品資訊、相關臨床指引及本網站醫療專業整理；實際適應症、禁忌症、劑量與使用方式仍以 TFDA 核准仿單及醫師評估為準。</div>
+<header><div class="logo">聊</div><div class="headerText"><h1>一起聊聊健康體位</h1><p>2024 國健署《一起聊聊肥胖症：你該問的100+件事》Q1–Q139 完整涵蓋版</p></div><button id="resetChat" class="resetBtn" type="button">↻ 重新開始</button></header>
+<div class="sourcebar"><b>主要資料來源：</b>衛生福利部國民健康署 2024《一起聊聊肥胖症：你該問的100+件事》。本工具依官方 <b>Q1–Q139</b> 逐題建立知識節點，回答為病人容易理解的摘要與重新表述，<b>不是官方原文逐字重製</b>。<span class="badge">139 個知識節點</span> <a href="https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12" target="_blank" rel="noopener">查看國健署資料</a><br><b>減重藥物資訊：</b>依台灣核准藥品資訊、相關臨床指引及本網站醫療專業整理；本站藥物內容整理日期：2026-10-18。實際適應症、禁忌症、劑量與使用方式仍以 TFDA 最新核准仿單及醫師評估為準。</div>
 <div class="layout">
 <aside>
 <div class="asideTitle">今天比較想聊哪一件事？</div>
+<div class="quickStartGrid">
 <button class="starter" data-intent="BMI">📏 先看看自己的體位</button>
 <button class="starter" data-intent="START">🥗 想開始減重</button>
 <button class="starter" data-intent="Q108">😵‍💫 一直卡關或復胖</button>
@@ -23,15 +24,19 @@
 <button class="starter" data-intent="ADOLESCENT_DRUGS">🧒 青少年減重藥</button>
 <button class="starter" data-intent="CHILD">🧒 小孩／青少年</button>
 <button class="starter" data-intent="OLDER">👵 長輩／肌少肥胖</button>
+</div>
+<button id="mobileToolsToggle" class="mobileToolsToggle" type="button">📚 更多主題與完整 139 題</button>
+<div id="secondaryTools" class="secondaryTools">
 <button id="browseBtn" class="browseBtn">📚 瀏覽完整 139 題</button>
 <input id="sideSearch" class="searchbox" placeholder="搜尋題庫，例如：脂肪肝、宵夜、手術">
 <div id="catlist" class="catlist"></div>
 <div id="questionList"></div>
 <div class="asideNote"><b>可以用生活化的語氣：</b><br>「165/72 算胖嗎？」<br>「小孩脖子黑黑的是什麼？」<br>「珍奶戒不掉怎麼辦？」<br>「做過減重手術可以懷孕嗎？」<br>「我爸 75 歲減重會不會掉肌肉？」</div>
+</div>
 </aside>
 <section class="chatcol"><div id="chat"></div><div class="composer"><div class="row"><input id="q" autocomplete="off" placeholder="想問什麼就直接說，例如：減重後月經亂掉正常嗎？"><button id="send">送出</button></div><div class="hint">本工具提供一般衛教。涉及診斷、藥物劑量、手術適應症或個別醫療決策時，仍需由醫師評估。</div></div></section>
 </div>
-<footer>請勿輸入姓名、病歷號、電話或其他可識別個人資料。若有胸痛、嚴重呼吸困難、昏厥、意識改變、持續嘔吐等急性不適，請立即就醫。 <span style="opacity:.65">版本 20261018-4</span></footer>
+<footer>請勿輸入姓名、病歷號、電話或其他可識別個人資料。<b>本工具不會儲存或上傳您在聊天框輸入的內容；問答配對於目前頁面中完成。</b> 若有胸痛、嚴重呼吸困難、昏厥、意識改變、持續嘔吐等急性不適，請立即就醫。 <span style="opacity:.65">版本 20261018-5</span></footer>
 </div>
-<script src="chatbot.js?v=20261018-4" defer></script>
+<script src="chatbot.js?v=20261018-5" defer></script>
 </body></html>
