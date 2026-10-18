@@ -16,7 +16,9 @@
     "adolescentLabel": "青少年可使用",
     "adolescentEligibility": "肥胖青少年；仿單載明僅在至少 6 個月以上、包含符合年齡之均衡飲食與行為／運動計畫仍未達成效時，才考慮使用。12 歲以下缺乏臨床研究。",
     "adolescentReassess": "使用約 12 週後若仍沒有體重下降，應回診重新評估是否有繼續治療的必要。",
-    "adolescentNote": "使用時仍需搭配低熱量、低脂且營養均衡的飲食；也要留意脂溶性維生素吸收與腸胃道副作用。"
+    "adolescentNote": "使用時仍需搭配低熱量、低脂且營養均衡的飲食；也要留意脂溶性維生素吸收與腸胃道副作用。",
+    "contentReviewedDate": "2026-10-18",
+    "sourceLabel": "台灣核准藥品資訊／TFDA 核准仿單（實際仍以最新仿單為準）"
   },
   {
     "id": "naltrexone_bupropion",
@@ -37,7 +39,9 @@
     "adolescentLabel": "台灣青少年減重適應症：未核准",
     "adolescentEligibility": "目前台灣核准的體重控制適應症為成人。",
     "adolescentReassess": "",
-    "adolescentNote": "青少年不應直接套用成人減重藥物適應症。"
+    "adolescentNote": "青少年不應直接套用成人減重藥物適應症。",
+    "contentReviewedDate": "2026-10-18",
+    "sourceLabel": "台灣核准藥品資訊／TFDA 核准仿單（實際仍以最新仿單為準）"
   },
   {
     "id": "liraglutide",
@@ -56,7 +60,9 @@
     "adolescentLabel": "12 歲以上青少年可使用",
     "adolescentEligibility": "適用於 12 歲以上、肥胖症（依 IOTF 年齡與性別分界，BMI 相當於成人 BMI ≥30 kg/m²）且體重超過 60 kg 的青少年，作為均衡飲食與增加體能活動的輔助治療。",
     "adolescentReassess": "每天 3.0 mg 或最高耐受劑量治療 12 週後，若 BMI 或 BMI 標準分數未下降至少 4%，應停止治療並重新評估。",
-    "adolescentNote": "須循序增加劑量並依耐受度調整；常見噁心、嘔吐、腹瀉、便秘等腸胃道症狀。"
+    "adolescentNote": "須循序增加劑量並依耐受度調整；常見噁心、嘔吐、腹瀉、便秘等腸胃道症狀。",
+    "contentReviewedDate": "2026-10-18",
+    "sourceLabel": "台灣核准藥品資訊／TFDA 核准仿單（實際仍以最新仿單為準）"
   },
   {
     "id": "semaglutide",
@@ -75,7 +81,9 @@
     "adolescentLabel": "12 歲以上青少年可使用",
     "adolescentEligibility": "適用於 12 歲以上、合併肥胖且體重超過 60 kg 的青少年，作為低熱量飲食與增加體能活動的輔助治療。",
     "adolescentReassess": "以 2.4 mg 或最高耐受劑量治療 12 週後，若 BMI 未下降至少 5%，應停止治療並重新評估。",
-    "adolescentNote": "每週注射一次，需依仿單逐步增加劑量；常見噁心、嘔吐、腹瀉、便秘等腸胃道症狀。"
+    "adolescentNote": "每週注射一次，需依仿單逐步增加劑量；常見噁心、嘔吐、腹瀉、便秘等腸胃道症狀。",
+    "contentReviewedDate": "2026-10-18",
+    "sourceLabel": "台灣核准藥品資訊／TFDA 核准仿單（實際仍以最新仿單為準）"
   },
   {
     "id": "tirzepatide",
@@ -94,6 +102,8 @@
     "adolescentLabel": "台灣青少年減重適應症：未核准",
     "adolescentEligibility": "目前台灣核准的體重控制適應症為成人。",
     "adolescentReassess": "",
-    "adolescentNote": "青少年不應直接套用成人減重藥物適應症。"
+    "adolescentNote": "青少年不應直接套用成人減重藥物適應症。",
+    "contentReviewedDate": "2026-10-18",
+    "sourceLabel": "台灣核准藥品資訊／TFDA 核准仿單（實際仍以最新仿單為準）"
   }
 ]
