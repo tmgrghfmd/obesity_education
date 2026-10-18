@@ -1,0 +1,322 @@
+[
+  {
+    "kind": "route",
+    "input": "脖子黑黑洗不掉",
+    "expected": "Q15"
+  },
+  {
+    "kind": "route",
+    "input": "小孩晚睡會不會胖",
+    "expected": "Q21"
+  },
+  {
+    "kind": "route",
+    "input": "孩子胖又會打呼",
+    "expected": "Q18"
+  },
+  {
+    "kind": "route",
+    "input": "果汁可以代替水果嗎",
+    "expected": "Q36"
+  },
+  {
+    "kind": "route",
+    "input": "我突然胖很多",
+    "expected": "Q62"
+  },
+  {
+    "kind": "route",
+    "input": "吃藥之後一直變胖",
+    "expected": "Q63"
+  },
+  {
+    "kind": "route",
+    "input": "脂肪肝需要減重嗎",
+    "expected": "Q64"
+  },
+  {
+    "kind": "route",
+    "input": "應該瘦幾公斤才算有效",
+    "expected": "Q65"
+  },
+  {
+    "kind": "route",
+    "input": "減重後一直掉頭髮",
+    "expected": "Q67"
+  },
+  {
+    "kind": "route",
+    "input": "瘦了以後月經不來",
+    "expected": "Q71"
+  },
+  {
+    "kind": "route",
+    "input": "一天到底要吃幾卡",
+    "expected": "Q72"
+  },
+  {
+    "kind": "route",
+    "input": "減肥一直很餓",
+    "expected": "Q73"
+  },
+  {
+    "kind": "route",
+    "input": "外食怎麼減肥",
+    "expected": "Q76"
+  },
+  {
+    "kind": "route",
+    "input": "不運動可以瘦嗎",
+    "expected": "Q78"
+  },
+  {
+    "kind": "route",
+    "input": "空腹運動比較燃脂嗎",
+    "expected": "Q81"
+  },
+  {
+    "kind": "route",
+    "input": "做家事算運動嗎",
+    "expected": "Q82"
+  },
+  {
+    "kind": "route",
+    "input": "玉米算澱粉嗎",
+    "expected": "Q86"
+  },
+  {
+    "kind": "route",
+    "input": "燕麥奶減重可以喝嗎",
+    "expected": "Q88"
+  },
+  {
+    "kind": "route",
+    "input": "輪班要怎麼減重",
+    "expected": "Q92"
+  },
+  {
+    "kind": "route",
+    "input": "生酮安全嗎",
+    "expected": "Q95"
+  },
+  {
+    "kind": "route",
+    "input": "真的沒時間運動",
+    "expected": "Q98"
+  },
+  {
+    "kind": "route",
+    "input": "減重為什麼要重訓",
+    "expected": "Q100"
+  },
+  {
+    "kind": "route",
+    "input": "只想瘦肚子",
+    "expected": "Q106"
+  },
+  {
+    "kind": "route",
+    "input": "我是不是意志力太差",
+    "expected": "Q107"
+  },
+  {
+    "kind": "route",
+    "input": "卡關",
+    "expected": "Q108"
+  },
+  {
+    "kind": "route",
+    "input": "停滯期怎麼辦",
+    "expected": "Q108"
+  },
+  {
+    "kind": "route",
+    "input": "家人一直買零食害我減不了",
+    "expected": "Q110"
+  },
+  {
+    "kind": "route",
+    "input": "暴食症還可以減重嗎",
+    "expected": "Q116"
+  },
+  {
+    "kind": "route",
+    "input": "台灣有哪些減重藥",
+    "expected": "Q118"
+  },
+  {
+    "kind": "route",
+    "input": "網購瘦瘦針可以嗎",
+    "expected": "Q119"
+  },
+  {
+    "kind": "route",
+    "input": "瀉藥可以減肥嗎",
+    "expected": "Q121"
+  },
+  {
+    "kind": "route",
+    "input": "做過減重手術可以懷孕嗎",
+    "expected": "Q122"
+  },
+  {
+    "kind": "route",
+    "input": "抽脂算治療肥胖嗎",
+    "expected": "Q124"
+  },
+  {
+    "kind": "route",
+    "input": "我適合做減重手術嗎",
+    "expected": "Q127"
+  },
+  {
+    "kind": "route",
+    "input": "BMI正常還想再瘦",
+    "expected": "Q131"
+  },
+  {
+    "kind": "route",
+    "input": "長輩胖一點比較好嗎",
+    "expected": "Q132"
+  },
+  {
+    "kind": "route",
+    "input": "長輩減重後沒力",
+    "expected": "Q135"
+  },
+  {
+    "kind": "route",
+    "input": "肌少肥胖是什麼",
+    "expected": "Q138"
+  },
+  {
+    "kind": "route",
+    "input": "75歲可以做減重手術嗎",
+    "expected": "Q139"
+  },
+  {
+    "kind": "conversation",
+    "input": "珍奶戒不掉怎麼辦",
+    "expected": "sugary_drinks"
+  },
+  {
+    "kind": "conversation",
+    "input": "嘴饞一直想吃",
+    "expected": "cravings_snacking"
+  },
+  {
+    "kind": "conversation",
+    "input": "昨天吃爆了是不是前功盡棄",
+    "expected": "cheat_guilt"
+  },
+  {
+    "kind": "conversation",
+    "input": "壓力大就一直吃",
+    "expected": "emotional_eating"
+  },
+  {
+    "kind": "conversation",
+    "input": "吃很少還是瘦不下來",
+    "expected": "eating_too_little_plateau"
+  },
+  {
+    "kind": "conversation",
+    "input": "無糖飲料可以一直喝嗎",
+    "expected": "sugarfree_drink"
+  },
+  {
+    "kind": "conversation",
+    "input": "瘦瘦針打一打就好嗎",
+    "expected": "weightloss_drug_magic"
+  },
+  {
+    "kind": "conversation",
+    "input": "水果吃很多會胖嗎",
+    "expected": "fruit_portion"
+  },
+  {
+    "kind": "conversation",
+    "input": "無糖拿鐵可以喝嗎",
+    "expected": "coffee_drinks"
+  },
+  {
+    "kind": "conversation",
+    "input": "聚餐前要不要少吃一餐",
+    "expected": "pre_party_restriction"
+  },
+  {
+    "kind": "conversation",
+    "input": "168適合減重嗎",
+    "expected": "intermittent_fasting"
+  },
+  {
+    "kind": "conversation",
+    "input": "重訓後體重反而增加",
+    "expected": "strength_weight_gain"
+  },
+  {
+    "kind": "conversation",
+    "input": "月經前體重增加很多",
+    "expected": "premenstrual_weight"
+  },
+  {
+    "kind": "conversation",
+    "input": "停瘦瘦針會不會復胖",
+    "expected": "drug_stop_regain"
+  },
+  {
+    "kind": "drug",
+    "input": "Wegovy 是什麼",
+    "expected": "semaglutide"
+  },
+  {
+    "kind": "drug",
+    "input": "善纖達每天都要打嗎",
+    "expected": "liraglutide"
+  },
+  {
+    "kind": "drug",
+    "input": "猛健樂副作用",
+    "expected": "tirzepatide"
+  },
+  {
+    "kind": "body",
+    "input": "身高170，體重80",
+    "expected": {
+      "h": 170,
+      "w": 80
+    }
+  },
+  {
+    "kind": "body",
+    "input": "170/80",
+    "expected": {
+      "h": 170,
+      "w": 80
+    }
+  },
+  {
+    "kind": "special",
+    "input": "15歲，165/72",
+    "expected": true
+  },
+  {
+    "kind": "special",
+    "input": "我懷孕了，160/70",
+    "expected": true
+  },
+  {
+    "kind": "followupDrug",
+    "drug": "semaglutide",
+    "input": "那青少年呢？",
+    "expected": true
+  },
+  {
+    "kind": "followupBody",
+    "lastBody": {
+      "waist": 83
+    },
+    "input": "如果是女生呢",
+    "expected": true
+  }
+]
