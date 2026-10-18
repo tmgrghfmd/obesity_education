@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261018-3';
+const BUILD_VERSION='20261018-4';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -553,8 +553,26 @@ function intentRoute(raw){
   if(/(我適合|能不能|可不可以|什麼人).*(減重手術|代謝手術)|(減重手術|代謝手術).*(適合嗎|適不適合|能不能做|可不可以做)/.test(s))
     return KB.find(x=>x.id==='Q127');
 
+  if(/(小孩|孩子|兒童|青少年).*(打呼|打鼾|睡覺很吵|睡覺喘)|(打呼|打鼾).*(小孩|孩子|兒童|青少年)/.test(s))
+    return KB.find(x=>x.id==='Q18');
+
+  if(/(果汁).*(代替|取代).*(水果)|(水果).*(可以用|用).*(果汁).*(代替|取代)/.test(s))
+    return KB.find(x=>x.id==='Q36');
+
+  if(/(一天|每日).*(吃|攝取).*(幾卡|多少卡|幾大卡|多少大卡)|(幾卡|多少卡|幾大卡|多少大卡).*(一天|每日)/.test(s))
+    return KB.find(x=>x.id==='Q72');
+
+  if(/(輪班|夜班|作息亂|三班|值夜班).*(減重|減肥|體重)|(減重|減肥).*(輪班|夜班|作息亂)/.test(s))
+    return KB.find(x=>x.id==='Q92');
+
+  if(/(抽脂|冷凍減脂|體雕).*(算|是不是|能不能).*(減重|治療肥胖|治療)|(治療肥胖|減重).*(抽脂|冷凍減脂|體雕)/.test(s))
+    return KB.find(x=>x.id==='Q124');
+
+  if(/(長輩|老人|高齡).*(胖一點|有點胖|胖胖的).*(比較好|有本錢|沒關係)|(胖一點比較好|胖一點有本錢).*(長輩|老人|高齡)?/.test(s))
+    return KB.find(x=>x.id==='Q132');
+
   // BMI／成人體位：先處理可執行功能，不讓它落入一般文字配對。
-  if(/(bmi|算.*胖|算.*體位|身高.*體重|體重.*身高|成人.*(過重|肥胖)|體位.*標準)/i.test(s))
+  if(/(bmi|算(不算)?胖|算(不算)?肥胖|算(不算)?過重|身高.*體重|體重.*身高|成人.*(過重|肥胖)|體位.*標準)/i.test(s))
     return KB.find(x=>x.id==='Q44');
 
   // 特殊族群先於一般關鍵字，避免「掉肌肉」被成人題吸走。
@@ -701,7 +719,7 @@ function ask(text){
   if(handleBMIInput(raw)) return;
 
   const simple=norm(raw);
-  if(!/(bmi正常|正常bmi|體重正常|健康體位).*(還想瘦|再瘦|想更瘦|繼續減)/i.test(simple) && /(想.*(算|看).*(bmi|體位|胖|肥胖|過重)|算不算肥胖|算不算胖|bmi怎麼算)/i.test(simple)){
+  if(!/(bmi正常|正常bmi|體重正常|健康體位).*(還想瘦|再瘦|想更瘦|繼續減)/i.test(simple) && /(想.*(算|看).*(bmi|體位)|算(不算)?肥胖|算(不算)?胖|算(不算)?過重|bmi怎麼算)/i.test(simple)){
     startIntent('BMI',false);
     return;
   }
