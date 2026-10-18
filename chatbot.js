@@ -1,10 +1,10 @@
 let KB=[];
 let DRUGS=[];
 
-const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
+const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null,currentQuestion:null,currentDrug:null,currentTopic:null,currentIntent:null,lastBody:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261018-4';
+const BUILD_VERSION='20261018-5';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -21,7 +21,7 @@ function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;',
 function msg(t,me=false){const c=document.getElementById('chat'),w=document.createElement('div');w.className='msg '+(me?'me':'bot');if(!me){const f=document.createElement('div');f.className='face';f.textContent='聊';w.appendChild(f)}const b=document.createElement('div');b.className='bubble';b.textContent=t;w.appendChild(b);c.appendChild(w);c.scrollTop=c.scrollHeight;}
 function factCard(item){const c=document.getElementById('chat'),d=document.createElement('div');d.className='factCard';d.innerHTML='<div class="factTitle">📖 2024 冊子重點</div><div class="factBody">'+esc(item.core)+'</div><div class="sourceQ"><b>對應官方 '+esc(item.id)+'</b><span>｜'+esc(item.cat)+'</span><a href="'+OFFICIAL+'" target="_blank" rel="noopener">查看國健署原始資料</a></div>';c.appendChild(d);}
 function actionCard(t){const c=document.getElementById('chat'),d=document.createElement('div');d.className='actionCard';d.innerHTML='<div class="actionTitle">你可以先這樣做</div><div class="actionBody">'+esc(t)+'</div>';c.appendChild(d);}
-function relatedFor(item){const n=parseInt(item.id.slice(1));let arr=[];for(let delta of [-2,-1,1,2,3]){const q=n+delta;if(q>=1&&q<=KB.length){const x=KB[q-1];if(x.cat===item.cat)arr.push(x)}}if(arr.length<3){for(const x of KB){if(x.cat===item.cat&&x.id!==item.id&&!arr.some(y=>y.id===x.id))arr.push(x);if(arr.length>=3)break}}return arr.slice(0,3);}
+function relatedFor(item){if(Array.isArray(item.related)&&item.related.length)return item.related.map(id=>KB.find(x=>x.id===id)).filter(Boolean).slice(0,3);return KB.filter(x=>x.cat===item.cat&&x.id!==item.id).slice(0,3);}
 function pills(items){const c=document.getElementById('chat'),box=document.createElement('div');box.className='pills';items.forEach(x=>{const b=document.createElement('button');b.className='pill';b.textContent=x.id+' '+x.title;b.onclick=()=>show(x,true);box.appendChild(b)});c.appendChild(box);c.scrollTop=c.scrollHeight;}
 
 function drugPanel(){
@@ -37,6 +37,7 @@ function drugPanel(){
 }
 
 function showAdolescentDrugPanel(echo=true){
+  STATE.currentDrug=null;STATE.currentQuestion='Q118';STATE.currentTopic='drug';STATE.currentIntent='adolescent_drugs';
   if(echo) msg('青少年可以用哪些減重藥？',true);
   msg('可以，但青少年不能直接套用成人的減重藥適應症。依台灣目前核准仿單，青少年可考慮的減重藥主要有 Orlistat、Liraglutide 與 Semaglutide，而且每一種都有自己的使用條件與療效停損點。');
 
@@ -62,6 +63,7 @@ function showAdolescentDrugPanel(echo=true){
 
 function showDrug(id,echo=false){
  const drug=DRUGS.find(x=>x.id===id); if(!drug)return;
+ STATE.currentDrug=id;STATE.currentQuestion='Q118';STATE.currentTopic='drug';STATE.currentIntent=null;
  if(echo)msg(drug.title,true);
  msg('可以，這一種我幫你整理成重點。');
  const c=document.getElementById('chat'),d=document.createElement('div'); d.className='drugDetail';
@@ -70,6 +72,7 @@ function showDrug(id,echo=false){
  '<p><span class="drugLabel">主要作用：</span>'+drug.mechanism+'</p>'+
  '<p><span class="drugLabel">常見副作用：</span>'+drug.common+'</p>'+
  '<p><span class="drugLabel">重要注意事項：</span>'+drug.caution+'</p>'+
+ '<p class="drugReviewed"><span class="drugLabel">資料整理日期：</span>'+esc(drug.contentReviewedDate||'')+'｜'+esc(drug.sourceLabel||'')+'</p>'+
     '<div class="drugWarn"><b>青少年使用：</b> '+esc(drug.adolescentLabel||'')+'<br>'+esc(drug.adolescentEligibility||'')+
     (drug.adolescentReassess?'<br><br><b>效果不佳時：</b> '+esc(drug.adolescentReassess):'')+
     (drug.adolescentNote?'<br><br><b>補充：</b> '+esc(drug.adolescentNote):'')+
@@ -164,6 +167,7 @@ function conversationLead(item){
 }
 
 function show(item,fromBrowse=false){
+  STATE.currentQuestion=item.id;STATE.currentDrug=null;STATE.currentTopic=item.cat;STATE.currentIntent=null;
   if(fromBrowse)msg(item.title,true);
   if(item.id==='Q44') STATE.pendingIntent='body';
   msg(conversationLead(item));
@@ -291,6 +295,7 @@ function showBodyAssessment(){
     else if(bmi>=24&&!wa.high) overall='腰圍目前未達腹部肥胖切點，但 BMI 偏高，仍建議從整體健康風險一起評估。';
     else overall='BMI 與腰圍目前都未達過重／腹部肥胖切點，建議持續維持健康飲食與規律活動。';
 
+    STATE.lastBody={height:h,weight:w,waist:waist,sex:sex,bmi:Number(bmi.toFixed(1))};STATE.currentTopic='body';STATE.currentQuestion='Q44';
     msg('我幫你一起看：\n'+h+' 公分、'+w+' 公斤，BMI 約 '+bmi.toFixed(1)+'，屬於「'+bmiClass+'」。\n'+wa.text+'\n\n'+overall);
     const q44=KB.find(x=>x.id==='Q44');
     if(q44) factCard(q44);
@@ -307,6 +312,7 @@ function showBodyAssessment(){
     else if(bmi<27){cls='過重';next='可以先從能長期維持的飲食與活動調整開始。';}
     else{cls='肥胖';next='建議再搭配腰圍與肥胖相關疾病一起評估，而不是只看 BMI。';}
 
+    STATE.lastBody={height:h,weight:w,waist:waist||null,sex:sex||null,bmi:Number(bmi.toFixed(1))};STATE.currentTopic='body';STATE.currentQuestion='Q44';
     msg('我幫你算好了：'+h+' 公分、'+w+' 公斤，BMI 約 '+bmi.toFixed(1)+'，依台灣成人標準屬於「'+cls+'」。\n\n'+next+'\n\n如果想一起看腹部肥胖，可以再輸入例如「男，腰圍92」或「女，腰圍82」。');
     const q44=KB.find(x=>x.id==='Q44');
     if(q44) factCard(q44);
@@ -316,6 +322,7 @@ function showBodyAssessment(){
 
   if(hasWaist){
     const wa=waistAssessment(sex,waist);
+    STATE.lastBody={height:h||null,weight:w||null,waist:waist,sex:sex,bmi:null};STATE.currentTopic='body';STATE.currentQuestion='Q45';
     msg(wa.text+'\n\n'+(wa.high?'腰圍達切點時，建議再搭配 BMI 與代謝相關健康狀況一起評估。':'腰圍目前未達腹部肥胖切點；若能再提供身高與體重，我也可以一起計算 BMI。'));
     pills(['Q44','Q45','Q50'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));
     resetBodyState();
@@ -372,6 +379,27 @@ function handleBMIInput(raw){
 }
 
 
+
+function extractAge(raw){const s=normalizeNumberText(raw),m=s.match(/(\d{1,2})\s*歲/);return m?Number(m[1]):null;}
+function bodyNumbersForSpecialAudience(raw){const cleaned=normalizeNumberText(raw).replace(/\d{1,2}\s*歲/g,' ').replace(/(小孩|孩子|兒童|青少年|高中生|國中生|懷孕|孕婦|孕期|目前|現在)/g,' ');let m=parseMeasurements(cleaned);if(!(m.h&&m.w)){const p=cleaned.match(/(1\d{2}(?:\.\d+)?)\s*[\/、,，\s]\s*(\d{2,3}(?:\.\d+)?)/);if(p){m.h=Number(p[1]);m.w=Number(p[2]);}}return m;}
+function hasBodyNumbers(raw){return /(身高|體重|cm|公分|kg|公斤|腰[圍围])|\d{3}\s*[\/、,，]\s*\d{2,3}/i.test(normalizeNumberText(raw));}
+function handleSpecialBodyAudience(raw){
+ if(!hasBodyNumbers(raw))return false;const s=norm(raw),age=extractAge(raw),isChild=(age!==null&&age<18)||/(小孩|孩子|兒童|青少年|高中生|國中生|未成年)/.test(s),isPreg=/(懷孕|孕婦|孕期|妊娠)/.test(s);
+ if(isPreg){resetBodyState();STATE.currentTopic='孕期與嬰兒';STATE.currentQuestion='Q3';msg('孕期的體重判讀和一般成人減重不同，不能直接用目前的 BMI 或成人腰圍切點判定該不該減重。孕期主要看懷孕前 BMI、目前孕週、單胎或多胎，以及整個孕期的增重趨勢。');const q=KB.find(x=>x.id==='Q3');if(q)factCard(q);pills(['Q1','Q3','Q5'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));return true;}
+ if(isChild){const m=bodyNumbersForSpecialAudience(raw);resetBodyState();STATE.currentTopic='兒童青少年';STATE.currentQuestion='Q7';if(m.h&&m.w){const bmi=m.w/Math.pow(m.h/100,2);msg('可以先算出 BMI 數值約 '+bmi.toFixed(1)+'，但兒童與青少年不能直接套用成人 BMI 24／27 的切點。要依年齡與性別對照兒少生長／BMI 標準，看長期曲線才有意義。');}else msg('兒童與青少年的體位不能直接套用成人 BMI 標準，需要年齡、性別、身高與體重一起對照生長／BMI 標準。');const q=KB.find(x=>x.id==='Q7');if(q)factCard(q);pills(['Q7','Q12','Q43'].map(id=>KB.find(x=>x.id===id)).filter(Boolean));return true;}
+ return false;
+}
+function handleContextFollowup(raw){
+ const s=norm(raw);
+ if(STATE.currentDrug){const drug=DRUGS.find(x=>x.id===STATE.currentDrug);if(drug&&/^(那)?(副作用|常見副作用|有什麼副作用|注意事項|禁忌|要注意什麼)(呢)?$/.test(s)){msg(drug.title+'常見副作用包括：'+drug.common+'\n\n重要注意事項：'+drug.caution);return true;}if(drug&&/^(那)?(青少年|小孩|兒童)(呢|可以嗎|能用嗎)?$/.test(s)){msg(drug.adolescentApproved?drug.title+'有青少年核准使用條件：'+drug.adolescentEligibility+(drug.adolescentReassess?'\n\n效果評估：'+drug.adolescentReassess:''):drug.title+'目前在台灣沒有青少年體重控制適應症，不能直接套用成人適應症。');return true;}}
+ if((STATE.currentQuestion==='Q118'||STATE.currentTopic==='drug')&&/^(那)?(青少年|小孩|兒童)(呢|可以嗎|能用嗎)?$/.test(s)){showAdolescentDrugPanel(false);return true;}
+ if((STATE.currentQuestion==='Q118'||STATE.currentTopic==='drug')&&/^(那)?(長輩|老人|高齡)(呢|可以嗎|能用嗎)?$/.test(s)){const q=KB.find(x=>x.id==='Q137');if(q)show(q);return true;}
+ if(STATE.currentTopic==='body'&&/^(那)?腰[圍围](呢|怎麼看|怎麼算|多少算高)?$/.test(s)){STATE.pendingIntent='body';msg('可以，再告訴我性別和腰圍，例如「男，腰圍92」或「女，腰圍82」，我會用成人腰圍切點一起判讀。');return true;}
+ if(STATE.currentTopic==='body'&&STATE.lastBody&&STATE.lastBody.waist&&/^(如果)?(是)?(女生|女性|男生|男性)(呢|的話)?$/.test(s)){const sex=/(女生|女性)/.test(s)?'F':'M',wa=waistAssessment(sex,STATE.lastBody.waist);msg('如果用'+wa.label+'標準看，同一個腰圍 '+STATE.lastBody.waist+' 公分，'+(wa.high?'已達':'未達')+'腹部肥胖切點（'+wa.label+'切點 '+wa.cutoff+' 公分）。');return true;}
+ if(STATE.currentQuestion&&/^(那)?(相關的呢|還有什麼相關|還能看什麼)$/.test(s)){const q=KB.find(x=>x.id===STATE.currentQuestion);if(q){pills(relatedFor(q));return true;}}return false;
+}
+function resetConversation(){STATE.pendingIntent=null;STATE.height=null;STATE.weight=null;STATE.sex=null;STATE.waist=null;STATE.currentQuestion=null;STATE.currentDrug=null;STATE.currentTopic=null;STATE.currentIntent=null;STATE.lastBody=null;const chat=document.getElementById('chat');if(chat)chat.innerHTML='';renderWelcome();}
+function renderWelcome(){msg('嗨，這一版把 2024 國健署冊子的 Q1 到 Q139 都拆成獨立題目了。\n\n你可以直接用生活化的方式問，也可以按左邊「瀏覽完整 139 題」慢慢看。每則回答下方都會標示對應的官方 Q 編號。');pills([KB[43],KB[64],KB[117]].filter(Boolean));}
 const CONVERSATION_INTENTS=[
   {
     id:'sugary_drinks',
@@ -475,6 +503,7 @@ const CONVERSATION_INTENTS=[
   }];
 
 function showConversationIntent(ci){
+  STATE.currentDrug=null;STATE.currentQuestion=(ci.refs&&ci.refs.length===1)?ci.refs[0]:null;STATE.currentTopic='conversation';STATE.currentIntent=ci.id;
   msg(ci.lead);
 
   const refs=ci.refs.map(id=>KB.find(x=>x.id===id)).filter(Boolean);
@@ -715,7 +744,8 @@ function ask(text){
     return;
   }
 
-  // 先處理 BMI 實際數值；可接受同一句或分兩次輸入。
+  if(handleSpecialBodyAudience(raw)) return;
+  if(handleContextFollowup(raw)) return;
   if(handleBMIInput(raw)) return;
 
   const simple=norm(raw);
@@ -849,6 +879,8 @@ function startIntent(intent,echoUser=true){
 
 function bindUI(){
   document.getElementById('send').onclick=()=>ask();
+  const reset=document.getElementById('resetChat');if(reset)reset.onclick=()=>resetConversation();
+  const mt=document.getElementById('mobileToolsToggle');if(mt)mt.onclick=()=>{const box=document.getElementById('secondaryTools');if(box){box.classList.toggle('open');mt.textContent=box.classList.contains('open')?'收起更多主題':'📚 更多主題與完整 139 題';}};
   document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});
   document.querySelectorAll('.starter').forEach(b=>b.onclick=()=>startIntent(b.dataset.intent));
 
@@ -866,8 +898,7 @@ async function init(){
     bindUI();
     renderCats();
 
-    msg('嗨，這一版把 2024 國健署冊子的 Q1 到 Q139 都拆成獨立題目了。\n\n你可以直接用生活化的方式問，也可以按左邊「瀏覽完整 139 題」慢慢看。每則回答下方都會標示對應的官方 Q 編號。');
-    pills([KB[43],KB[64],KB[117]]);
+    renderWelcome();
   }catch(error){
     console.error(error);
     const chat=document.getElementById('chat');
