@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261018-2';
+const BUILD_VERSION='20261018-3';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -528,6 +528,31 @@ function intentRoute(raw){
     return KB.find(x=>x.id==='Q71');
 
 
+  // 常見口語句型：先處理比 BMI／一般搜尋更具體的意圖。
+  if(/(小孩|孩子|兒童|青少年).*(晚睡|睡不夠|熬夜|睡眠不足)|(晚睡|睡不夠|熬夜).*(小孩|孩子|兒童|青少年)/.test(s))
+    return KB.find(x=>x.id==='Q21');
+
+  if(/(減重|減肥|瘦身|體重下降).*(掉頭髮|掉髮|禿|頭髮掉)|(掉頭髮|掉髮).*(減重|減肥|瘦身)/.test(s))
+    return KB.find(x=>x.id==='Q67');
+
+  if(/(減重|減肥|節食).*(很餓|一直餓|肚子餓|餓到)|(很餓|一直餓|肚子餓).*(減重|減肥|節食)/.test(s))
+    return KB.find(x=>x.id==='Q73');
+
+  if(/(瘦|減).*(幾公斤|多少公斤).*(目標|有效|合理)|(目標|有效|合理).*(瘦|減).*(幾公斤|多少公斤)|(應該|需要).*(瘦|減).*(幾公斤|多少公斤)/.test(s))
+    return KB.find(x=>x.id==='Q65');
+
+  if(/(bmi正常|正常bmi|體重正常|健康體位).*(還想瘦|再瘦|想更瘦|繼續減)|(還想瘦|想更瘦|繼續減).*(bmi正常|正常bmi|體重正常|健康體位)/.test(s))
+    return KB.find(x=>x.id==='Q131');
+
+  if(/(65歲|70歲|75歲|80歲|長輩|老人|高齡).*(減重手術|代謝手術|縮胃|胃繞道)|(減重手術|代謝手術).*(65歲|70歲|75歲|80歲|長輩|老人|高齡)/.test(s))
+    return KB.find(x=>x.id==='Q139');
+
+  if(/(高中生|青少年|未成年).*(減重手術|代謝手術|縮胃)|(減重手術|代謝手術).*(高中生|青少年|未成年)/.test(s))
+    return KB.find(x=>x.id==='Q130');
+
+  if(/(我適合|能不能|可不可以|什麼人).*(減重手術|代謝手術)|(減重手術|代謝手術).*(適合嗎|適不適合|能不能做|可不可以做)/.test(s))
+    return KB.find(x=>x.id==='Q127');
+
   // BMI／成人體位：先處理可執行功能，不讓它落入一般文字配對。
   if(/(bmi|算.*胖|算.*體位|身高.*體重|體重.*身高|成人.*(過重|肥胖)|體位.*標準)/i.test(s))
     return KB.find(x=>x.id==='Q44');
@@ -676,7 +701,7 @@ function ask(text){
   if(handleBMIInput(raw)) return;
 
   const simple=norm(raw);
-  if(/(想.*(算|看).*(bmi|體位|胖|肥胖|過重)|算不算肥胖|算不算胖|bmi怎麼算)/i.test(simple)){
+  if(!/(bmi正常|正常bmi|體重正常|健康體位).*(還想瘦|再瘦|想更瘦|繼續減)/i.test(simple) && /(想.*(算|看).*(bmi|體位|胖|肥胖|過重)|算不算肥胖|算不算胖|bmi怎麼算)/i.test(simple)){
     startIntent('BMI',false);
     return;
   }
