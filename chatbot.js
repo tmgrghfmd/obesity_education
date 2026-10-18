@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261005-3';
+const BUILD_VERSION='20261018-1';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -444,8 +444,20 @@ function showConversationIntent(ci){
   c.scrollTop=c.scrollHeight;
 }
 
+
+const WEIGHT_PLATEAU_COLLOQUIAL={
+  id:'weight_plateau_colloquial',
+  test:s=>/^(卡關|停滯|停滯期|卡住)$/.test(s) || /(減重|減肥|體重|瘦).*(卡關|停滯|卡住|不動|沒變)|(卡關|停滯|卡住).*(減重|減肥|體重|瘦)/.test(s),
+  lead:'如果體重卡關或停滯，先別急著把飲食再砍更低；減重過程本來就可能出現平台期。',
+  body:'體重會受水分、生理變化、飲食、活動、睡眠與身體適應影響。單看幾天沒有下降，不一定代表完全沒有進展。',
+  action:'先看 2–4 週趨勢，並一起看腰圍、體能和生活習慣；如果長時間都沒有變化，再和醫療團隊一起找可能卡住的原因。',
+  refs:['Q108'],
+  follow:['我一直復胖怎麼辦？','一天什麼時間量體重最準？','我明明吃很少還是瘦不下來']
+};
+
 function conversationIntentRoute(raw){
   const s=norm(raw);
+  if(WEIGHT_PLATEAU_COLLOQUIAL.test(s)) return WEIGHT_PLATEAU_COLLOQUIAL;
   return CONVERSATION_INTENTS.find(x=>x.test(s))||null;
 }
 
@@ -473,7 +485,7 @@ function intentRoute(raw){
   if(/(減重手術|代謝手術).*(懷孕|生育)|(懷孕|生育).*(減重手術|代謝手術)/.test(s))
     return KB.find(x=>x.id==='Q122');
 
-  if(/(復胖|胖回來|體重卡住|瘦不下來|減不下來|平台期)/.test(s))
+  if(/(復胖|胖回來|卡關|一直卡關|減重卡關|減肥卡關|卡住|一直卡住|停滯|停滯期|減重停滯|體重停滯|體重不動|體重沒變|瘦不下來|減不下來|瘦不動|減不動|平台期|平台|卡在同一個體重)/.test(s))
     return KB.find(x=>x.id==='Q108');
 
   if(!/(小孩|孩子|兒童|青少年)/.test(s) && /(睡不好|睡不夠|睡眠不足|熬夜|晚睡|作息亂)/.test(s))
