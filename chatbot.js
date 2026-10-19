@@ -4,7 +4,7 @@ let DRUGS=[];
 const STATE={pendingIntent:null,height:null,weight:null,sex:null,waist:null,currentQuestion:null,currentDrug:null,currentTopic:null,currentIntent:null,lastBody:null};
 const BROAD_KEYS=new Set(['減重','減肥','肥胖','體重','飲食','運動','健康','藥物','手術','兒童','青少年','長者','老人','血糖','血脂','血壓','水腫','腰圍','心理','精神科','過重']);
 
-const BUILD_VERSION='20261018-7';
+const BUILD_VERSION='20261019-1';
 
 const CATEGORIES=["孕期與嬰兒", "兒童青少年", "成人體位", "肥胖與健康", "安全減重", "飲食與活動", "心理與維持", "藥物與手術", "高齡體重管理"];
 const OFFICIAL='https://health99.hpa.gov.tw/health99/HealthEducation/Detail/8681?nodeId=12';
@@ -545,6 +545,11 @@ const WEIGHT_PLATEAU_COLLOQUIAL={
   follow:['我一直復胖怎麼辦？','一天什麼時間量體重最準？','我明明吃很少還是瘦不下來']
 };
 
+function exactQuestionRoute(raw){
+  const s=norm(raw);
+  return KB.find(x=>norm(x.title)===s)||null;
+}
+
 function conversationIntentRoute(raw){
   const s=norm(raw);
   if(WEIGHT_PLATEAU_COLLOQUIAL.test(s)) return WEIGHT_PLATEAU_COLLOQUIAL;
@@ -767,6 +772,13 @@ function ask(text){
 
   if(STATE.pendingIntent==='body' && !/(身高|體重|腰[圍围]|bmi|公分|公斤|kg|男性|女性|男生|女生|^\s*\d{2,3}(?:\.\d+)?\s*$)/i.test(raw)){
     resetBodyState();
+  }
+
+  // 官方 139 題原題文字優先，避免被較廣的口語規則搶走。
+  const exactQuestion=exactQuestionRoute(raw);
+  if(exactQuestion){
+    show(exactQuestion);
+    return;
   }
 
   const conversational=conversationIntentRoute(raw);
