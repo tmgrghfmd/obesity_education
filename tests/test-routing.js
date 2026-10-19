@@ -28,6 +28,7 @@ vm.createContext(context);
 vm.runInContext(source,context,{filename:'chatbot.js'});
 
 function resolveRoute(input){
+  const exact=context.exactQuestionRoute(input); if(exact) return {type:'route',id:exact.id};
   const ci=context.conversationIntentRoute(input);
   if(ci) return {type:'conversation',id:ci.id};
   if(context.isPhentermineQuery(input)) return {type:'phentermine',id:'phentermine'};
@@ -43,6 +44,15 @@ function resolveRoute(input){
 }
 
 let failures=[];
+
+// Every official Q1–Q139 title must resolve to itself before broader rules.
+for(const item of KB){
+  const got=resolveRoute(item.title);
+  if(got.type!=='route'||got.id!==item.id){
+    failures.push({case:{kind:'official-title',input:item.title,expected:item.id},got});
+  }
+}
+
 for(const c of CASES){
   try{
     if(c.kind==='route'||c.kind==='conversation'||c.kind==='drug'){
@@ -78,4 +88,4 @@ if(failures.length){
   console.error(JSON.stringify({passed:CASES.length-failures.length,total:CASES.length,failures},null,2));
   process.exit(1);
 }
-console.log('Routing regression: '+CASES.length+'/'+CASES.length+' passed');
+console.log('Routing regression: '+(CASES.length+KB.length)+'/'+(CASES.length+KB.length)+' passed (including 139 official titles)');
